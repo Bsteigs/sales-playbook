@@ -1,1 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Playbook — Abacus Group</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#030812;--navy2:#060f20;--navy3:#0a1628;--navy4:#0e1f38;
+  --blue:#3b82f6;--blue2:#60a5fa;--blue3:#93c5fd;
+  --slate:#94a3b8;--slate2:#cbd5e1;--white:#f8fafc;
+  --amber:#f59e0b;--red:#ef4444;--green:#22c55e;--purple:#a78bfa;--teal:#2dd4bf;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--slate2);min-height:100vh;font-size:13px;line-height:1.6;background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(59,130,246,.12) 0%,transparent 70%);background-attachment:fixed}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;background:rgba(6,15,32,.9);border-bottom:1px solid rgba(59,130,246,.15);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;box-shadow:0 0 16px rgba(59,130,246,.35)}
+.logo-text{font-size:13px;font-weight:600;color:var(--white)}
+.logo-sub{font-size:11px;color:rgba(148,163,184,.5);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn{padding:6px 13px;font-size:11px;font-weight:500;border:1px solid rgba(59,130,246,.2);border-radius:7px;cursor:pointer;background:rgba(59,130,246,.06);color:var(--slate);transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn:hover{background:rgba(59,130,246,.15);color:var(--blue2);border-color:rgba(59,130,246,.4)}
+.btn.on{background:rgba(59,130,246,.2);color:var(--blue2);border-color:rgba(59,130,246,.5)}
+.btn.danger{border-color:rgba(239,68,68,.2);color:rgba(239,68,68,.7);background:rgba(239,68,68,.05)}
+.btn.danger:hover,.btn.danger.on{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.5);color:var(--red)}
+.edit-btn{padding:6px 14px;font-size:11px;font-weight:600;border:1px solid rgba(59,130,246,.25);border-radius:7px;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue3);transition:all .15s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px}
+.edit-btn:hover{border-color:rgba(59,130,246,.5);background:rgba(59,130,246,.15)}
+.edit-btn.on{background:rgba(59,130,246,.2);border-color:var(--blue);color:var(--blue2)}
+.edit-pulse{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.save-status{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--slate);padding-right:4px}
+.save-dot{width:5px;height:5px;border-radius:50%}
+.save-dot.saving{background:var(--amber);animation:pulse 1s infinite}
+.save-dot.saved{background:var(--green)}
+.main{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 52px);overflow:hidden}
+.sidebar{background:rgba(6,15,32,.6);border-right:1px solid rgba(59,130,246,.1);overflow-y:auto;padding:16px 0 40px}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:2px}
+.content{overflow-y:auto;padding:24px 36px 60px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:2px}
+.nav-section-label{font-size:9px;font-weight:600;color:rgba(59,130,246,.4);text-transform:uppercase;letter-spacing:.12em;padding:8px 16px 6px;font-family:'DM Mono',monospace}
+.stage-tabs{padding:0 12px;margin-bottom:4px}
+.stage-tab{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;width:100%;border:none;background:transparent;text-align:left;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--slate);transition:all .15s;position:relative}
+.stage-tab:hover{background:rgba(59,130,246,.08);color:var(--blue2)}
+.stage-tab.on{background:rgba(59,130,246,.12);color:var(--white)}
+.stage-tab.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--blue);border-radius:0 2px 2px 0}
+.stage-badge{margin-left:auto;font-size:10px;font-weight:600;background:rgba(59,130,246,.15);color:var(--blue3);padding:1px 7px;border-radius:10px;font-family:'DM Mono',monospace}
+.stage-tab.on .stage-badge{background:rgba(59,130,246,.25);color:var(--blue2)}
+.nav-divider{height:1px;background:rgba(59,130,246,.08);margin:10px 16px}
+.nav-section-title{font-size:9px;font-weight:600;color:rgba(148,163,184,.4);text-transform:uppercase;letter-spacing:.1em;padding:8px 16px 4px;font-family:'DM Mono',monospace}
+.nav-item{display:flex;align-items:flex-start;gap:8px;padding:5px 16px;cursor:pointer;color:rgba(148,163,184,.6);font-size:11.5px;transition:all .12s;border-left:2px solid transparent;margin:1px 0}
+.nav-item:hover{color:var(--blue2);border-left-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04)}
+.nav-num{font-size:9px;font-weight:600;color:rgba(59,130,246,.35);font-family:'DM Mono',monospace;min-width:16px;margin-top:1px}
+/* PANELS */
+.panel,.panel-grid{display:none;border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.panel.on,.panel-grid.on{display:block}
+.panel-grid.on{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.panel-h{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;font-family:'DM Mono',monospace}
+.rules-panel{background:rgba(69,10,10,.4);border:1px solid rgba(239,68,68,.2)}.rules-h{color:var(--red)}
+.vt-panel{background:rgba(5,46,22,.4);border:1px solid rgba(34,197,94,.15)}.vt-h{color:var(--green)}
+.fw-panel{background:rgba(46,16,101,.3);border:1px solid rgba(167,139,250,.15)}.fw-h{color:var(--purple)}
+.panel-ul{list-style:none}
+.panel-ul li{font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);line-height:1.45;color:var(--slate)}
+.panel-ul li:last-child{border-bottom:none}
+.fw-tabs{display:flex;gap:5px;margin-bottom:12px}
+.fw-tab{padding:4px 11px;font-size:11px;font-weight:500;border:1px solid rgba(167,139,250,.2);border-radius:6px;cursor:pointer;background:transparent;color:rgba(167,139,250,.5);font-family:'DM Sans',sans-serif;transition:all .12s}
+.fw-tab.on{background:rgba(167,139,250,.15);border-color:var(--purple);color:var(--purple)}
+.fw-cnt{display:none}.fw-cnt.on{display:block}
+.fw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.fw-item{background:rgba(14,31,56,.6);border:1px solid rgba(59,130,246,.12);border-radius:8px;padding:10px}
+.fw-L{font-size:18px;font-weight:600;color:var(--purple);font-family:'DM Mono',monospace;line-height:1}
+.fw-N{font-size:9px;font-weight:600;color:rgba(148,163,184,.5);text-transform:uppercase;letter-spacing:.06em;margin:3px 0 5px}
+.fw-Q{font-size:11px;color:var(--slate);line-height:1.4}
+.fw-list{list-style:none}
+.fw-list li{font-size:12px;color:var(--slate);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);line-height:1.45}
+.fw-list li:last-child{border-bottom:none}
+.fw-list li b{color:var(--purple)}
+/* 12Q */
+.q12{background:linear-gradient(135deg,rgba(29,78,216,.15) 0%,rgba(14,31,56,.6) 100%);border:1px solid rgba(59,130,246,.25);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 0 40px rgba(59,130,246,.06)}
+.q12-hd{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.q12-hd:hover{background:rgba(59,130,246,.08)}
+.q12-left{display:flex;align-items:center;gap:10px}
+.q12-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:#fff;box-shadow:0 0 16px rgba(59,130,246,.4);flex-shrink:0}
+.q12-lbl{font-size:13px;font-weight:600;color:var(--white)}
+.q12-hint{font-size:11px;color:var(--slate);margin-top:1px}
+.q12-arr{font-size:10px;color:var(--blue3);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:transform .2s;flex-shrink:0}
+.q12.open .q12-arr{transform:rotate(180deg)}
+.q12-body{display:none;padding:4px 18px 16px;border-top:1px solid rgba(59,130,246,.12)}
+.q12.open .q12-body{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.q12-item{font-size:12.5px;color:var(--slate2);padding:6px 0;border-bottom:1px solid rgba(59,130,246,.08);line-height:1.5;display:flex;align-items:baseline;gap:8px}
+.q12-num{font-size:10px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace;min-width:18px;flex-shrink:0}
+/* STAGE HEADER */
+.stage-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(59,130,246,.1)}
+.stage-header-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.stage-header-title{font-size:18px;font-weight:600;color:var(--white);letter-spacing:-.3px}
+.stage-header-sub{font-size:12px;color:var(--slate);margin-top:2px}
+/* SECTIONS */
+.sec{border-radius:12px;margin-bottom:8px;overflow:hidden;transition:all .15s;border:1px solid rgba(59,130,246,.1)}
+.sec:hover{border-color:rgba(59,130,246,.22);box-shadow:0 4px 24px rgba(0,0,0,.2)}
+.sec.open{border-color:rgba(59,130,246,.28);box-shadow:0 4px 32px rgba(0,0,0,.25)}
+.sec.b-blue{background:linear-gradient(135deg,rgba(29,78,216,.1) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-white{background:linear-gradient(135deg,rgba(100,116,139,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-teal{background:linear-gradient(135deg,rgba(45,212,191,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-amber{background:linear-gradient(135deg,rgba(245,158,11,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-red{background:linear-gradient(135deg,rgba(239,68,68,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-purple{background:linear-gradient(135deg,rgba(167,139,250,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-green{background:linear-gradient(135deg,rgba(34,197,94,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec.b-gray{background:linear-gradient(135deg,rgba(71,85,105,.08) 0%,rgba(10,22,40,.8) 60%)}
+.sec-hd{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:0;transition:background .12s}
+.sec-hd:hover{background:rgba(59,130,246,.04)}
+.sec-bar{width:3px;min-width:3px;margin-right:16px;align-self:stretch;border-radius:2px;opacity:.8}
+.sec-num{font-size:10px;font-weight:600;color:rgba(59,130,246,.5);font-family:'DM Mono',monospace;min-width:22px;margin-right:4px}
+.sec-meta{flex:1;min-width:0}
+.sec-title{font-size:14px;font-weight:600;color:var(--white);letter-spacing:-.1px}
+.sec-sub{font-size:12px;color:rgba(148,163,184,.7);margin-top:3px;line-height:1.4}
+.sec-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-left:12px}
+.sec-arr{width:22px;height:22px;border-radius:5px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--blue3);transition:transform .2s,background .15s}
+.sec.open .sec-arr{transform:rotate(180deg);background:rgba(59,130,246,.15)}
+.sec-body{display:none;padding:2px 18px 18px;border-top:1px solid rgba(59,130,246,.1)}
+.sec.open .sec-body{display:block}
+.bar-blue{background:#3b82f6}.bar-white{background:#64748b}.bar-teal{background:#2dd4bf}
+.bar-amber{background:#f59e0b}.bar-red{background:#ef4444}.bar-purple{background:#a78bfa}
+.bar-green{background:#22c55e}.bar-gray{background:#475569}
+/* ── CONTENT BLOCKS — fixed visibility ── */
+.lbl{
+  font-size:11px;font-weight:700;color:#93c5fd;
+  text-transform:uppercase;letter-spacing:.08em;
+  margin:16px 0 9px;display:flex;align-items:center;gap:8px;
+  font-family:'DM Mono',monospace;
+}
+.lbl::after{content:'';flex:1;height:1px;background:rgba(59,130,246,.2)}
+.lbl:first-child{margin-top:6px}
+.q1{font-size:14px;font-weight:400;color:var(--white);font-style:italic;line-height:1.7;padding:12px 16px;border-left:2px solid var(--blue);background:rgba(59,130,246,.08);border-radius:0 9px 9px 0;margin:8px 0 6px;transition:background .15s}
+.q1:hover{background:rgba(59,130,246,.12)}
+.q2{font-size:12.5px;color:var(--slate2);font-style:italic;line-height:1.65;padding:5px 0 5px 14px;border-left:1px solid rgba(59,130,246,.25);margin-bottom:4px}
+.q2 b{color:var(--white);font-style:normal;font-weight:500}
+.lock{font-size:14px;font-weight:500;color:var(--amber);font-style:italic;padding:12px 16px;border-left:2px solid var(--amber);background:rgba(245,158,11,.08);border-radius:0 9px 9px 0;margin:10px 0;line-height:1.7}
+.note{font-size:12px;color:rgba(203,213,225,.7);line-height:1.55;margin:10px 0;padding:9px 13px;background:rgba(59,130,246,.05);border-radius:7px;border:1px solid rgba(59,130,246,.12)}
+.note b{color:var(--slate2)}
+.thread{font-size:12.5px;color:#93c5fd;background:rgba(29,78,216,.12);border-left:2px solid rgba(59,130,246,.5);border-radius:0 9px 9px 0;padding:10px 14px;margin:10px 0;line-height:1.6}
+.thread b{color:#bfdbfe}
+.mapblock{font-size:12.5px;color:var(--purple);background:rgba(167,139,250,.08);border-left:2px solid rgba(167,139,250,.4);border-radius:0 9px 9px 0;padding:10px 14px;margin:10px 0;line-height:1.6}
+.insight{font-size:12.5px;color:#6ee7b7;background:rgba(6,78,59,.15);border-left:2px solid rgba(34,197,94,.4);border-radius:0 9px 9px 0;padding:10px 14px;margin:10px 0;line-height:1.6}
+.insight b{color:#a7f3d0}
+.variant{font-size:12px;color:rgba(167,139,250,.9);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:7px;padding:9px 12px;margin:6px 0;line-height:1.6;font-style:italic}
+.variant-lbl{font-size:9px;font-weight:700;color:rgba(167,139,250,.6);text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace;margin-bottom:4px}
+.flow-arrow{display:flex;justify-content:center;align-items:center;height:18px;margin:0;color:rgba(59,130,246,.2);font-size:12px;pointer-events:none}
+/* EDIT */
+.editable{outline:none;border-radius:4px;transition:background .12s;cursor:text}
+.edit-mode .editable:hover{background:rgba(59,130,246,.08)}
+.edit-mode .editable:focus{background:rgba(59,130,246,.12);outline:1px solid rgba(59,130,246,.35);border-radius:5px}
+.del-sec-btn{display:none;width:22px;height:22px;border:1px solid rgba(239,68,68,.25);border-radius:5px;background:transparent;color:rgba(239,68,68,.5);font-size:12px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.edit-mode .del-sec-btn{display:flex}
+.del-sec-btn:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.1)}
+.add-section-btn{display:none;width:100%;padding:12px;border:1px dashed rgba(59,130,246,.2);border-radius:10px;background:rgba(59,130,246,.03);color:rgba(59,130,246,.4);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-top:8px}
+.edit-mode .add-section-btn{display:block}
+.add-section-btn:hover{border-color:rgba(59,130,246,.5);color:var(--blue3);background:rgba(59,130,246,.08)}
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(14,31,56,.95);border:1px solid rgba(59,130,246,.3);border-radius:9px;padding:10px 16px;font-size:12px;color:var(--white);z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.on{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:rgba(34,197,94,.4);color:var(--green)}
+.toast.err{border-color:rgba(239,68,68,.4);color:var(--red)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(3,8,18,.8);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.on{display:flex}
+.modal{background:rgba(10,22,40,.95);border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:28px;width:360px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.modal h3{font-size:16px;font-weight:600;color:var(--white);margin-bottom:6px}
+.modal p{font-size:12px;color:var(--slate);margin-bottom:18px}
+.modal input{width:100%;padding:9px 13px;background:rgba(6,15,32,.8);border:1px solid rgba(59,130,246,.25);border-radius:8px;color:var(--white);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:12px;outline:none;transition:border-color .15s}
+.modal input:focus{border-color:rgba(59,130,246,.6)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.modal-cancel{background:transparent;border:1px solid rgba(59,130,246,.2);color:var(--slate)}
+.modal-cancel:hover{color:var(--white)}
+.modal-ok{background:var(--blue);border:1px solid var(--blue);color:#fff}
+.modal-ok:hover{background:#2563eb}
+.modal-err{font-size:11px;color:var(--red);margin-top:-8px;margin-bottom:10px;display:none}
+@media(max-width:900px){.main{grid-template-columns:1fr}.sidebar{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">AG</div>
+    <div><div class="logo-text">Sales Playbook</div><div class="logo-sub">Abacus Group</div></div>
+  </div>
+  <div class="topbar-right">
+    <div class="save-status" id="save-status"><div class="save-dot" id="save-dot"></div><span id="save-text"></span></div>
+    <button class="btn danger" id="btn-rules" onclick="togPanel('rules')">Field Rules</button>
+    <button class="btn" id="btn-vt" onclick="togPanel('vt')">Between Calls</button>
+    <button class="btn" id="btn-fw" onclick="togPanel('fw')">Frameworks</button>
+    <button class="edit-btn" id="edit-btn" onclick="showEditModal()"><span id="edit-icon">✦</span><span id="edit-label">Edit Mode</span></button>
+  </div>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div class="nav-section-label" style="padding-top:4px">Stage</div>
+    <div class="stage-tabs">
+      <button class="stage-tab on" id="tab-d" onclick="setStage('d')"><span>Discovery</span><span class="stage-badge" id="badge-d">10</span></button>
+      <button class="stage-tab" id="tab-m" onclick="setStage('m')"><span>Mid-Cycle</span><span class="stage-badge" id="badge-m">5</span></button>
+      <button class="stage-tab" id="tab-c" onclick="setStage('c')"><span>Closing</span><span class="stage-badge" id="badge-c">7</span></button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section-title">Sections</div>
+    <div id="nav-sections"></div>
+  </div>
+  <div class="content" id="main-content">
+    <div class="panel-grid rules-panel" id="panel-rules">
+      <div><div class="panel-h rules-h">Never Do This</div><ul class="panel-ul"><li>No monologues over 30 seconds</li><li>No early solutioning</li><li>No pitch before Implication</li><li>No deck dumping</li><li>No competing on tools</li><li>No AI/SOC/IR unless tied to pain</li><li>Never ask for budget directly</li><li>Never leave without next step booked</li><li>Silence is a weapon</li><li>The buyer must verbalize risk themselves</li></ul></div>
+      <div><div class="panel-h rules-h">Deal Killers</div><ul class="panel-ul"><li>"What's your budget?"</li><li>"Are you happy with your MSP?"</li><li>"What tools are you using?"</li><li>"How soon are you switching?"</li><li>"Who makes the final decision?"</li><li>"Why did you take this call?"</li><li>"Let me show you how we do it."</li><li>"What's not working?"</li><li>"Can we circle back later?"</li><li>"Does that make sense?"</li></ul></div>
+      <div><div class="panel-h rules-h">Emergency Resets</div><ul class="panel-ul"><li>"Let me pause us and realign on what matters most to you."</li><li>"I want to pull us back to the risk you mentioned earlier."</li><li>"Before I go deeper, is this actually relevant to what you're solving?"</li><li>"I want to stay aligned with your priorities here."</li></ul></div>
+    </div>
+    <div class="panel-grid vt-panel" id="panel-vt">
+      <div><div class="panel-h vt-h">Post-Call Reflection</div><ul class="panel-ul"><li>What rapport did we build?</li><li>Business challenges they mentioned?</li><li>Questions I didn't fully answer?</li><li>Concerns or objections that surfaced?</li><li>Other stakeholders mentioned?</li></ul></div>
+      <div><div class="panel-h vt-h">Research Triggers</div><ul class="panel-ul"><li>LinkedIn — theirs and company page</li><li>Google News: "[Company] + news"</li><li>SEC filings, regulatory updates</li><li>New hires, departures, org changes</li><li>Industry publications, company blog</li></ul></div>
+      <div><div class="panel-h vt-h">Execution Rules</div><ul class="panel-ul"><li>Short and specific — can't feel templated</li><li>Don't give them homework</li><li>Personal reference OR something useful</li><li>One touchpoint per week max</li><li>14+ days dark → pattern interrupt</li></ul></div>
+    </div>
+    <div class="panel fw-panel" id="panel-fw">
+      <div class="fw-tabs">
+        <button class="fw-tab on" onclick="fwTab('medd',this)">MEDDPICC</button>
+        <button class="fw-tab" onclick="fwTab('chal',this)">Challenger</button>
+        <button class="fw-tab" onclick="fwTab('spin',this)">SPIN</button>
+      </div>
+      <div class="fw-cnt on" id="fw-medd"><div class="fw-grid">
+        <div class="fw-item"><div class="fw-L">M</div><div class="fw-N">Metrics</div><div class="fw-Q">Quantifiable impact. Numbers + deadline.</div></div>
+        <div class="fw-item"><div class="fw-L">E</div><div class="fw-N">Economic Buyer</div><div class="fw-Q">Who controls budget? Whose world changes?</div></div>
+        <div class="fw-item"><div class="fw-L">D</div><div class="fw-N">Decision Criteria</div><div class="fw-Q">What drives the decision? What disqualifies?</div></div>
+        <div class="fw-item"><div class="fw-L">D</div><div class="fw-N">Decision Process</div><div class="fw-Q">Steps to decision. Any procurement gates?</div></div>
+        <div class="fw-item"><div class="fw-L">P</div><div class="fw-N">Paper Process</div><div class="fw-Q">Legal, contract terms, procurement.</div></div>
+        <div class="fw-item"><div class="fw-L">I</div><div class="fw-N">Identify Pain</div><div class="fw-Q">Compelling event. In their language.</div></div>
+        <div class="fw-item"><div class="fw-L">C</div><div class="fw-N">Champion</div><div class="fw-Q">Who sells internally when you're not there?</div></div>
+        <div class="fw-item"><div class="fw-L">C</div><div class="fw-N">Competition</div><div class="fw-Q">Who else evaluated? What's their edge?</div></div>
+      </div></div>
+      <div class="fw-cnt" id="fw-chal"><ul class="fw-list">
+        <li><b>Teach</b> — Lead with a commercial insight across peers, not what you sell.</li>
+        <li><b>Tailor</b> — Connect the insight to their specific challenge and role.</li>
+        <li><b>Take control</b> — Prescribe the next step. Don't wait to be asked.</li>
+        <li><b>Insight insert (one per call, after pain)</b> — "Most MSP failures aren't technical. They're operating model failures." Always follow: "Does that resonate, or is your situation different?"</li>
+      </ul></div>
+      <div class="fw-cnt" id="fw-spin"><div class="fw-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="fw-item"><div class="fw-L">S</div><div class="fw-N">Situation</div><div class="fw-Q">"How is IT structured today?"</div></div>
+        <div class="fw-item"><div class="fw-L">P</div><div class="fw-N">Problem</div><div class="fw-Q">"Where do handoffs break down?"</div></div>
+        <div class="fw-item"><div class="fw-L">I</div><div class="fw-N">Implication</div><div class="fw-Q">"What's the business impact?"</div></div>
+        <div class="fw-item"><div class="fw-L">N</div><div class="fw-N">Need-Payoff</div><div class="fw-Q">"If solved, what would be different?"</div></div>
+      </div></div>
+    </div>
+    <div id="stage-header-area"></div>
+    <div id="sections-container"></div>
+    <button class="add-section-btn" id="add-section-btn" onclick="addSection()">+ Add section to this stage</button>
+  </div>
+</div>
+</div>
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <h3>Edit Mode</h3>
+    <p>Enter your password to unlock inline editing.</p>
+    <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-err" id="pw-err">Incorrect password</div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-ok" onclick="checkPw()">Unlock</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SUPABASE_URL='https://bworvabohfduydrpytax.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3b3J2YWJvaGZkdXlkcnB5dGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MzA4NTIsImV4cCI6MjA4OTEwNjg1Mn0.wfmJibcBk2kc4IraiWtnrbD_fbBLIzT8cYpEhg5TTIo';
+const EDIT_PASSWORD='abacus2024';
+let editMode=false,activeStage='d',saveTimer=null,activeSections=[],panelOn={rules:false,vt:false,fw:false};
 
+async function supaRequest(method,path,body){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
+    method,
+    headers:{
+      'apikey':SUPABASE_KEY,
+      'Authorization':'Bearer '+SUPABASE_KEY,
+      'Content-Type':'application/json',
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    },
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!res.ok){const t=await res.text();throw new Error(t)}
+  const t=await res.text();
+  return t?JSON.parse(t):null;
+}
+
+async function loadSections(){
+  try{
+    const data=await supaRequest('GET','sections?order=position.asc,stage.asc');
+    if(data&&data.length>0){activeSections=data;}
+    else{activeSections=DEFAULT_SECTIONS;await seedDatabase();}
+  }catch(e){
+    activeSections=DEFAULT_SECTIONS;
+    showToast('Using local data — '+e.message,'err');
+  }
+  renderAll();
+}
+
+async function seedDatabase(){
+  setSaveStatus('saving');
+  try{
+    await supaRequest('POST','sections',DEFAULT_SECTIONS);
+    setSaveStatus('saved');
+  }catch(e){showToast('Seed failed: '+e.message,'err');setSaveStatus('');}
+}
+
+async function saveSection(id){
+  const s=activeSections.find(x=>x.id===id);
+  if(!s)return;
+  setSaveStatus('saving');
+  try{
+    await supaRequest('POST','sections',[{id:s.id,stage:s.stage,bar:s.bar,title:s.title,subtitle:s.subtitle,content:s.content,position:s.position,updated_at:new Date().toISOString()}]);
+    setSaveStatus('saved');
+  }catch(e){setSaveStatus('');showToast('Save failed: '+e.message,'err');}
+}
+
+function setSaveStatus(state){
+  const dot=document.getElementById('save-dot'),text=document.getElementById('save-text');
+  dot.className='save-dot'+(state?' '+state:'');
+  text.textContent=state==='saving'?'Saving...':state==='saved'?'Saved':'';
+  if(state==='saved')setTimeout(()=>{dot.className='save-dot';text.textContent=''},2000);
+}
+function showEditModal(){if(editMode){disableEdit();return;}document.getElementById('edit-modal').classList.add('on');setTimeout(()=>document.getElementById('pw-input').focus(),100);}
+function closeModal(){document.getElementById('edit-modal').classList.remove('on');document.getElementById('pw-input').value='';document.getElementById('pw-err').style.display='none';}
+function checkPw(){
+  if(document.getElementById('pw-input').value===EDIT_PASSWORD){closeModal();enableEdit();}
+  else{document.getElementById('pw-err').style.display='block';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();}
+}
+function enableEdit(){editMode=true;document.body.classList.add('edit-mode');const btn=document.getElementById('edit-btn');btn.classList.add('on');document.getElementById('edit-icon').innerHTML='<div class="edit-pulse"></div>';document.getElementById('edit-label').textContent='Editing';showToast('Edit mode on — click any text to edit','ok');renderAll();}
+function disableEdit(){editMode=false;document.body.classList.remove('edit-mode');document.getElementById('edit-btn').classList.remove('on');document.getElementById('edit-icon').textContent='✦';document.getElementById('edit-label').textContent='Edit Mode';renderAll();}
+function togPanel(k){panelOn[k]=!panelOn[k];document.getElementById('panel-'+k).classList.toggle('on',panelOn[k]);document.getElementById('btn-'+k)?.classList.toggle('on',panelOn[k]);}
+function fwTab(id,el){document.querySelectorAll('.fw-tab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.fw-cnt').forEach(c=>c.classList.remove('on'));el.classList.add('on');document.getElementById('fw-'+id).classList.add('on');}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on'+(type?' '+type:'');setTimeout(()=>t.className='toast',3000);}
+function setStage(stage){activeStage=stage;['d','m','c'].forEach(s=>{document.getElementById('tab-'+s)?.classList.toggle('on',s===stage);});document.getElementById('main-content').scrollTop=0;renderAll();}
+const STAGE_INFO={d:{title:'Discovery',sub:'Uncover pain, establish urgency, set the stage',icon:'🔍'},m:{title:'Mid-Cycle',sub:'Build consensus, qualify deeply, maintain momentum',icon:'⚡'},c:{title:'Closing',sub:'Execute with precision — confirm, negotiate, close',icon:'🎯'}};
+function renderAll(){renderNav();renderStageHeader();renderSections();updateBadges();}
+function updateBadges(){['d','m','c'].forEach(s=>{const el=document.getElementById('badge-'+s);if(el)el.textContent=activeSections.filter(x=>x.stage===s).length;});}
+function renderNav(){const el=document.getElementById('nav-sections');if(!el)return;el.innerHTML=activeSections.filter(s=>s.stage===activeStage).map((s,i)=>`<div class="nav-item" onclick="scrollToSec('${s.id}')"><span class="nav-num">${String(i+1).padStart(2,'0')}</span><span>${s.title}</span></div>`).join('');}
+function renderStageHeader(){const info=STAGE_INFO[activeStage];document.getElementById('stage-header-area').innerHTML=`<div class="stage-header"><div class="stage-header-icon" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)">${info.icon}</div><div><div class="stage-header-title">${info.title}</div><div class="stage-header-sub">${info.sub}</div></div></div>`;}
+function renderSections(){
+  const container=document.getElementById('sections-container');
+  const stageSecs=activeSections.filter(s=>s.stage===activeStage);
+  let html='';
+  if(activeStage==='d')html+=renderQ12();
+  stageSecs.forEach((s,i)=>{html+=renderSection(s,i);if(i<stageSecs.length-1)html+=`<div class="flow-arrow">↓</div>`;});
+  container.innerHTML=html;
+}
+function renderQ12(){
+  return`<div class="q12" id="q12"><div class="q12-hd" onclick="this.closest('.q12').classList.toggle('open')"><div class="q12-left"><div class="q12-icon">12</div><div><div class="q12-lbl">The Only 12 Questions</div><div class="q12-hint">Compass for the full call — expand to reference</div></div></div><div class="q12-arr">▼</div></div><div class="q12-body">${Q12.map(q=>`<div class="q12-item"><span class="q12-num">${String(q.n).padStart(2,'0')}</span>${q.q}</div>`).join('')}</div></div>`;
+}
+function renderSection(sec,idx){
+  const barClass='bar-'+(sec.bar||'gray').replace('b-','');
+  const bgClass='b-'+(sec.bar||'b-gray').replace('b-','');
+  const te=editMode?'contenteditable="true"':'';
+  return`<div class="sec ${bgClass}" id="sec-${sec.id}"><div class="sec-hd" onclick="togSec('${sec.id}',event)"><div class="sec-bar ${barClass}"></div><span class="sec-num">${String(idx+1).padStart(2,'0')}</span><div class="sec-meta"><div class="sec-title" ${te} data-id="${sec.id}" data-field="title" onblur="onFieldBlur(this,'${sec.id}','title')" onclick="if(editMode)event.stopPropagation()">${sec.title}</div><div class="sec-sub" ${te} data-id="${sec.id}" data-field="subtitle" onblur="onFieldBlur(this,'${sec.id}','subtitle')" onclick="if(editMode)event.stopPropagation()">${sec.subtitle||''}</div></div><div class="sec-actions"><button class="del-sec-btn" onclick="delSection('${sec.id}',event)" title="Delete">×</button><div class="sec-arr">▼</div></div></div><div class="sec-body"><div ${editMode?'contenteditable="true"':''} data-id="${sec.id}" onblur="onContentBlur(this,'${sec.id}')">${sec.content||''}</div></div></div>`;
+}
+function togSec(id,e){if(editMode&&e.target.hasAttribute('contenteditable')&&e.target.getAttribute('contenteditable')==='true')return;document.getElementById('sec-'+id)?.classList.toggle('open');}
+function scrollToSec(id){const el=document.getElementById('sec-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.add('open');}}
+function onFieldBlur(el,id,field){const s=activeSections.find(x=>x.id===id);if(!s)return;const val=el.innerText.trim();if(s[field]===val)return;s[field]=val;clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveSection(id),800);renderNav();}
+function onContentBlur(el,id){const s=activeSections.find(x=>x.id===id);if(!s)return;const val=el.innerHTML;if(s.content===val)return;s.content=val;clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveSection(id),800);}
+function addSection(){const stage=prompt('Stage? d=Discovery, m=Mid-Cycle, c=Closing','d');if(!stage||!['d','m','c'].includes(stage))return;const id='sec-'+Date.now();const s={id,stage,title:'New Section',subtitle:'Click to edit subtitle',content:`<div class="lbl">Questions</div><div class="q1">Add your first question here</div>`,bar:'b-blue',position:activeSections.length};activeSections.push(s);supaRequest('POST','sections',[s]).catch(()=>{});if(activeStage!==stage)setStage(stage);else renderAll();setTimeout(()=>scrollToSec(id),150);}
+async function delSection(id,e){e.stopPropagation();if(!confirm('Delete this section?'))return;activeSections=activeSections.filter(s=>s.id!==id);try{await supaRequest('DELETE',`sections?id=eq.${id}`)}catch(e){}renderAll();showToast('Section deleted');}
+
+const Q12=[
+  {n:1,q:"What changed that made this a priority now?"},{n:2,q:"What was the moment you knew the current model wasn't enough?"},
+  {n:3,q:"What's working well today?"},{n:4,q:"What's quietly causing friction the team tolerates?"},
+  {n:5,q:"Where does your MSP feel reactive vs proactive?"},{n:6,q:"Where do handoffs break down?"},
+  {n:7,q:"What happens when it's urgent and high-stakes?"},{n:8,q:"When that happens, what's the impact on the business?"},
+  {n:9,q:"If nothing changes for 6-12 months, what's the outcome?"},{n:10,q:"If this was solved properly, what would be different?"},
+  {n:11,q:"How will you measure success if you change providers?"},{n:12,q:"What are the internal steps from here to a decision?"}
+];
+
+const DEFAULT_SECTIONS=[
+{id:'prewire',stage:'d',bar:'b-gray',title:'Pre-Wire & Positioning',subtitle:'Set the frame before they do — lead, don\'t follow',position:1,content:`<div class="lbl">Pattern Framing Opener — Lead With This</div>
+<div class="q1">"I've been talking with COOs, CTOs, and CCOs at PE firms and hedge funds. The consistent friction: 1. service execution not scaling, 2. security controls drifting, 3. compliance pressure rising — ODDs, Reg S-P, DORA. How much sounds like your world, and what am I missing?"</div>
+<div class="lbl">The Quiet Damage — Financial Services Specific</div>
+<div class="insight"><b>What we keep finding is the real damage comes from the quiet stuff:</b><br><br>
+• <b>Time leakage</b> — people waiting on tickets or avoiding IT altogether, building workarounds<br>
+• <b>Context switching</b> — senior people pulled back into ticket wars. COOs, CTOs — what else would they be working on?<br>
+• <b>Reputation risk</b> — a sloppy IT moment during DD or an SEC exam, a time suck<br>
+• <b>Delay penalty</b> — upgrades that never happen, controls that lag<br>
+• <b>Mental tax</b> — users just accepting that this is as good as it gets<br>
+• <b>Projects stall</b> — cloud moves, AI, security hardening move slower than the business. How do you then compete with your peers?<br><br>
+None of that shows up as a clean line item on a P&L — but it slows deals, delays audits, and erodes the edge a fund like yours needs.</div>
+<div class="lbl">Real Drivers — Pick the Most Relevant</div>
+<div class="q2"><b>Service drag:</b> slow, inconsistent support, ticket ping-pong, no continuity</div>
+<div class="q2"><b>Regulatory pressure:</b> SEC / FCA / DORA / LPs demanding real evidence, not slideware</div>
+<div class="q2"><b>Security illusion:</b> tools deployed, but misconfigured, fragmented, and untested</div>
+<div class="q2"><b>Modernization gap:</b> cloud / AI / Zero Trust always "next quarter"</div>
+<div class="q2"><b>Operational & reputational risk:</b> sloppy IT moments in front of LPs, auditors, or boards</div>
+<div class="lbl">Emerging Risks — Drop These Into Context</div>
+<div class="q2"><b>Generalist MSP drift:</b> relationship built for a different era. Not keeping pace with IaC, SDLC integration, GitOps. Gap between internal engineering standards and MSP delivery widens quietly.</div>
+<div class="q2"><b>Shadow AI exposure:</b> Claude, ChatGPT, Copilot spreading across firm and portfolio. Data leaving in ways that don't hit your SIEM. Prompt injection, DLP gaps, permission sprawl in LLM tooling — none of it in scope when the contract was signed.</div>
+<div class="q2"><b>Identity as the new perimeter:</b> MFA fatigue attacks, token theft, Entra misconfigs. Attack surface evolving faster than any single vendor can map.</div>
+<div class="q2"><b>Strategic velocity:</b> whether the current model is keeping pace with AI rollout, hybrid policy shifts, and regulatory evolution. Architecture decisions lag when there's no external pressure-testing.</div>
+<div class="lbl">Follow-Ups</div>
+<div class="q2">"Which is causing the most leadership drag right now: service, risk/compliance, cost, or modernization?"</div>
+<div class="q2">"Where is the current model breaking: people, process, tooling, or governance?"</div>
+<div class="note">You're not pitching. You're framing. Goal is to get them expanding on their world before you ask anything.</div>`},
+{id:'agenda',stage:'d',bar:'b-white',title:'Agenda + Open',subtitle:'Command the room from the first minute',position:2,content:`<div class="lbl">Opening Script</div>
+<div class="q1">"Goal today — understand where IT is causing friction, and if we can help, share what we're seeing in the market."</div>
+<div class="lbl">Establish Homework — First 60 Seconds</div>
+<div class="q1">"As I was preparing for this meeting, here's what I know about your business..."</div>
+<div class="lbl">Check Intent — Prevents Posturing</div>
+<div class="q2">"If this hour is well spent, what would we have covered?"</div>
+<div class="lbl">Set the Lane</div>
+<div class="q2">"Some firms are sanity-checking their MSP. Others are actively comparing models. Which is closer to reality?"</div>
+<div class="note">Setting the lane forces a real answer on where they actually are. Their answer to "what would we have covered" tells you their priority immediately.</div>`},
+{id:'currentstate',stage:'d',bar:'b-teal',title:'Current State + Friction',subtitle:'Map the operating model — pick the failure modes that land',position:3,content:`<div class="lbl">Service Operating Model</div>
+<div class="q1">"How is IT coverage structured today — internal vs MSP vs contractors?"</div>
+<div class="q2">"When something breaks, who owns it end-to-end?"</div>
+<div class="q2">"Do you have visibility into tickets? Can you prioritize them effectively?"</div>
+<div class="q2">"Where do handoffs break down — tickets, projects, security, vendors, leadership updates?"</div>
+<div class="lbl">MSP Failure Modes — Pick ONE Lane and Drill</div>
+<div class="q2"><b>Service ownership:</b> "Do you have a dedicated team that knows your environment?"</div>
+<div class="q2"><b>Change control:</b> "Do changes happen without clear communication or accountability? Think updates, patches."</div>
+<div class="q2"><b>Visibility:</b> "Do you have real reporting, or are you chasing updates?"</div>
+<div class="q2"><b>Resiliency:</b> "If something major went down, how confident are you the response would be clean and coordinated?"</div>
+<div class="q2"><b>Operational maturity:</b> "Are they helping you plan forward, or just keeping the lights on?"</div>
+<div class="lbl">Dig Deeper</div>
+<div class="q2">"We see responsiveness and lack of expertise as the two biggest issues. What does this look like for you — do they understand your business?"</div>
+<div class="q2">"Have there been moments in the past 6-12 months where your provider left you feeling exposed — compliance, security, or client-facing?"</div>
+<div class="q2">"Would your current setup withstand LP, SEC, or ODD scrutiny?"</div>
+<div class="q2">"Are they helping you think through AI or providing any strategic guidance?"</div>
+<div class="lbl">Environment Qualifying</div>
+<div class="q2">"Any upcoming projects: office moves, app rollouts, cloud change, M&amp;A, fund launches?"</div>
+<div class="note"><b>Rule:</b> If you catch yourself going too technical here, stop.</div>`},
+{id:'trigger',stage:'d',bar:'b-amber',title:'Trigger + Why Now',subtitle:'Find the compelling event — this is what makes the deal real',position:4,content:`<div class="lbl">Core Door Opener</div>
+<div class="q1">"Walk me through what changed that led you to explore a new partnership now."</div>
+<div class="lbl">Force Specificity</div>
+<div class="q1">"What was the moment where it became clear the current model wasn't enough?"</div>
+<div class="lbl">Why Now</div>
+<div class="q1">"You mentioned [pain]. Why is this getting attention now versus 6 months ago? What changed?"</div>
+<div class="lbl">Labeling — Confirm and Deepen</div>
+<div class="lock">"It sounds like the core issue is ___. Did I get that right?"</div>
+<div class="lbl">Regulatory Follow-Ups</div>
+<div class="q2">"Is this connected to Reg S-P readiness as deadlines hit?"</div>
+<div class="q2">"Any EU exposure where DORA is forcing third-party oversight or resilience proof?"</div>
+<div class="note">Listen for: incident/near-miss, audit/ODD escalation, leadership change, cost spike, failed DR test, tool sprawl, vendor fatigue.</div>`},
+{id:'currentstate2',stage:'d',bar:'b-red',title:'Implications',subtitle:'Make the cost of inaction real — they must verbalize the risk',position:5,content:`<div class="lbl">Business Impact</div>
+<div class="q1">"When that happens, what's the business impact in the moment?"</div>
+<div class="q2">"What does that cost you: time, risk exposure, missed initiatives, reputation?"</div>
+<div class="q2">"What percent of your time is being spent dealing with these issues?"</div>
+<div class="lbl">Risk Amplification</div>
+<div class="q2">"How does this show up during an SEC exam, LP diligence, or cyber insurance renewal?"</div>
+<div class="q2">"If this happened during a market event or peak period, what breaks first?"</div>
+<div class="lbl">Make It Real</div>
+<div class="q1">"If nothing changes for 6-12 months, what's the likely outcome?"</div>
+<div class="lbl">Impact Lock-In — Mandatory</div>
+<div class="lock">"Of everything we discussed, which risk worries you most right now?"</div>
+<div class="note">Do NOT move to Future State until they have verbalized the risk in their own words.</div>`},
+{id:'futurestate',stage:'d',bar:'b-blue',title:'Future State + Success Definition',subtitle:"Let them define what good looks like — don't define it for them",position:6,content:`<div class="lbl">Vision Questions</div>
+<div class="q1">"If this were solved properly, what would be different day to day?"</div>
+<div class="q2">"What does excellent look like from an MSP partner?"</div>
+<div class="q2">"What would this free your internal team up to focus on?"</div>
+<div class="lbl">Force Prioritization</div>
+<div class="q1">"If we could fix only one thing first, what would have the biggest impact?"</div>
+<div class="lbl">Quantify the Outcome</div>
+<div class="q1">"If we fast-forward 6 months and you're saying this worked — what's measurably different? Fewer escalations, faster resolution, tighter controls, shorter ODD cycles. Which 1-2 metrics matter most, and by how much?"</div>
+<div class="lbl">Past Effort</div>
+<div class="q2">"What have you tried before? Why hasn't it worked?"</div>
+<div class="q2">"If you work with us, what are you hoping will be different?"</div>
+<div class="note">Listen for: a number + a deadline. "Better" is not enough. If they can't quantify, the deal isn't real yet.</div>`},
+{id:'process',stage:'d',bar:'b-purple',title:'Process Discovery',subtitle:'MEDDPIC + NEAT — neither interrogate nor avoid',position:7,content:`<div class="note">This is where most reps either interrogate or avoid. Do neither.</div>
+<div class="lbl">Metrics</div>
+<div class="q1">"What KPIs does leadership care about — response times, outages, project velocity, audit readiness, cost predictability?"</div>
+<div class="q2">"How will you measure success if you change providers?"</div>
+<div class="lbl">Decision Criteria + Process</div>
+<div class="q2">"When you compare MSPs, what actually drives the decision?"</div>
+<div class="q2">"What would disqualify a provider immediately?"</div>
+<div class="q2">"Walk me through the internal steps from here to a decision."</div>
+<div class="q2">"Any legal, security review, or procurement gates we should plan for?"</div>
+<div class="lbl">Economic Buyer — Without Saying It</div>
+<div class="q1">"Whose world changes the most if this gets fixed?"</div>
+<div class="lbl">Timing</div>
+<div class="q2">"What's the forcing function on your side?"</div>
+<div class="q2">"Is there a date you need the new model live by?"</div>
+<div class="lbl">Budget — Qualify Without Asking</div>
+<div class="q2">"Are you optimizing for lowest cost, or for removing risk and friction permanently?"</div>
+<div class="q2">"Are you trying to stay within similar spend, or open to investing more if the model is materially better?"</div>
+<div class="note">If they don't know who the economic buyer is, you don't have a qualified opportunity yet.</div>`},
+{id:'technical',stage:'d',bar:'b-blue',title:'Technical Discovery — CTO / CISO',subtitle:'Deeper technical credibility with the security and infrastructure buyers',position:8,content:`<div class="lbl">CTO — Technology & Roadmap</div>
+<div class="q1">"What drains your team's time that shouldn't — and what would they be building if that time was freed up?"</div>
+<div class="q2">"How aligned is your security roadmap to your broader business objectives right now?"</div>
+<div class="q2">"Where's the gap between what your MSP promises and what actually gets delivered?"</div>
+<div class="q2">"How are you thinking about support as you modernize the stack — co-managed, fully outsourced, or something in between?"</div>
+<div class="q2">"When it comes to AI rollout — Copilot, LLM tooling, agentic workflows — is your MSP involved in the governance and architecture decisions, or are those happening around them?"</div>
+<div class="lbl">CISO — Security Posture & Compliance</div>
+<div class="q1">"Would your current setup withstand LP, SEC, or ODD scrutiny — and how confident are you in that answer?"</div>
+<div class="q2">"How are you managing identity and access across endpoints, cloud, and SaaS today — and where does conditional access policy ownership sit?"</div>
+<div class="q2">"When did you last pressure-test your incident response — and what did that process actually reveal?"</div>
+<div class="q2">"Where do you have the least visibility right now — endpoints, cloud, identity, or SaaS apps?"</div>
+<div class="q2">"How are you thinking about shadow AI exposure — data leaving via LLM tooling, prompt injection risk, DLP gaps? Is that in scope with your current provider, or is it falling to internal resources?"</div>
+<div class="lbl">Both Personas — Architecture + Velocity</div>
+<div class="q2">"Is your current model keeping pace with your AI rollout, hybrid policy shifts, and regulatory evolution — or are architecture decisions lagging because there's no external pressure-testing?"</div>
+<div class="q2">"As your Azure or AWS footprint grows, do you have proactive visibility into consumption and rightsizing — or is the bill just arriving?"</div>
+<div class="note">If your MSP isn't actively managing conditional access, monitoring for configuration drift, and pressure-testing identity controls, what we often see is internal teams filling those gaps with their own tooling — which the MSP then can't co-manage.</div>`},
+{id:'closedcircuit',stage:'d',bar:'b-white',title:'Closed Circuit Summary + Next Step',subtitle:'Prescriptive control — you lead from here',position:9,content:`<div class="lbl">Recap — Short, Then Check</div>
+<div class="q1">"Here's what I heard. Tell me what I missed: 1. ___ 2. ___ 3. ___"</div>
+<div class="lbl">Post-Discovery Recap Email — Send Within 2 Hours</div>
+<div class="mapblock">Subject: "What I heard today — [Company]" | Next steps + booked date at the TOP | 3-4 problems in their exact language | End with: "Does this reflect what you're solving, or did I miss something?" — This becomes your champion's internal selling document.</div>
+<div class="lbl">Prescribe — Don't Ask, Tell</div>
+<div class="q1">"The right next step is a working session where we map your priorities to an operating model: support, change control, compliance readiness, governance."</div>
+<div class="lbl">Lock Calendar Live</div>
+<div class="lock">"Does Tuesday or Thursday work to review a recommended operating model?"</div>
+<div class="note">No punting. No "I'll send something." No next step booked = no deal.</div>
+<div class="lbl">Insight Insert — One Max, After Pain Is Established</div>
+<div class="q2">"Most MSP failures aren't technical — they're operating model failures: unclear ownership, weak change control, no accountability."</div>
+<div class="q1">"Does that resonate here, or is your situation different?"</div>`},
+{id:'multithread-d',stage:'d',bar:'b-blue',title:'Multi-Threading — Plant the Seed',subtitle:'Do this in every first call. Army of champions beats one champion.',position:10,content:`<div class="lbl">Seed Question — After Pain Is Established</div>
+<div class="q1">"When you think about the issues you're describing — who else on the team is feeling that most directly?"</div>
+<div class="q2">"Who else would have a perspective here that we should be hearing from?"</div>
+<div class="lbl">Anchor High When Asking for Access</div>
+<div class="q1">"Typically at firms your stage, we'd want to connect with your COO, CTO or head of IT, and CCO or compliance lead. Does it make sense to get them involved early so we're not designing the wrong solution?"</div>
+<div class="note">Ask for more than you need. If they say no to three but yes to one, you've gained ground.</div>
+<div class="lbl">Exec Access Via Champion</div>
+<div class="q2">"Would it make sense to include [exec] on our next call? It saves significant time when they're involved early rather than having to re-run discovery."</div>
+<div class="lbl">Ghostwrite for Your Champion</div>
+<div class="thread"><b>Draft the buying group invite for them.</b> Their words, not yours. Attach the one-page problem statement you've built together. Remove every friction point — don't make them do the writing.</div>
+<div class="lbl">One-Page Problem Statement</div>
+<div class="q2">3-4 bullets in their language summarizing the risks they verbalized</div>
+<div class="q2">"Here's what I heard. Tell me what I missed." — this is their internal selling document</div>
+<div class="note"><b>Red flag:</b> 3+ calls in and still talking to one person. The deal is at risk.</div>`},
+
+{id:'multithread-m',stage:'m',bar:'b-blue',title:'Multi-Threading — Expand the Room',subtitle:"If you're still single-threaded here, the deal is at risk",position:11,content:`<div class="lbl">Getting to Additional Stakeholders</div>
+<div class="q1">"Based on what we've discussed, [stakeholder] would have a real stake in this outcome. Would it make sense to include them so we're not designing something that needs to go back to them anyway?"</div>
+<div class="q2">"Who else would feel the impact of this most directly?"</div>
+<div class="lbl">Variant — Softer Ask</div>
+<div class="variant"><div class="variant-lbl">When champion is protective</div>"I want to make sure we're solving for everyone who'll be living with this decision day to day. Who else should have a voice in this before we go further?"</div>
+<div class="lbl">Executive Access — Go Direct</div>
+<div class="q1">"I'd love to spend 20 minutes with [executive] — not to pitch, but to make sure we're aligned on strategic priorities before we go further. Would you be comfortable making an introduction?"</div>
+<div class="variant"><div class="variant-lbl">Exec access via value framing</div>"In my experience, the deals that move fastest are the ones where [exec] has context early. It saves us both from designing something that needs rework later. Is there a natural way to include them?"</div>
+<div class="lbl">Pre-Call Each Stakeholder Before Group Meetings</div>
+<div class="q2">"I want to make sure the conversation is relevant to you specifically. What's most important to you going into this?"</div>
+<div class="note">15 minutes before any multi-stakeholder meeting. Then personalize your questions to each person in the room.</div>
+<div class="lbl">Ghostwrite for Your Champion</div>
+<div class="thread"><b>Draft the email they send to bring others in.</b> Their words. Updated problem statement attached. Don't make them do the writing.</div>
+<div class="note"><b>Red flag:</b> Champion says "I'll handle internal conversations." Friendly, but dangerous. Push for direct access.</div>`},
+{id:'preproposal',stage:'m',bar:'b-teal',title:'Pre-Proposal Qualification + Budget',subtitle:'Run before sending anything — confirm fit, budget, and urgency',position:12,content:`<div class="lbl">Positioning + Fit</div>
+<div class="q1">"Based on our conversations, how are you feeling about Abacus as a fit for what you're trying to accomplish?"</div>
+<div class="q2">"Is there anything you've seen — or haven't seen — that would change how you're thinking about this?"</div>
+<div class="q1">"If you had to explain to your partners why you're considering us over the incumbent, what would you say?"</div>
+<div class="lbl">Budget Authority — Confirm Before Proposing</div>
+<div class="q2">"Has budget been formally allocated, or is that still being determined?"</div>
+<div class="q2">"What's the approved budget range? I want to make sure we design the right model, not an oversized one."</div>
+<div class="q2">"Are there any financial approvals still needed before a decision can be made?"</div>
+<div class="q2">"How does this compare to other priorities competing for budget right now?"</div>
+<div class="q2">"What's the process for getting final financial approval — and who's involved in that sign-off?"</div>
+<div class="lbl">Variant — Budget Without Asking Directly</div>
+<div class="variant"><div class="variant-lbl">Softer approach</div>"To avoid designing the wrong model — are you optimizing for lowest cost, or for permanently removing risk and operational friction?"</div>
+<div class="lbl">Urgency + Buying Signal</div>
+<div class="q1">"If we got you a proposal this week, is this something you're ready to move on — or are there still open questions we need to address first?"</div>
+<div class="q2">"What would need to be true for you to feel confident moving forward?"</div>
+<div class="q2">"Is this a 'we need to fix this now' situation, or more 'we should get to this eventually'?"</div>
+<div class="note">If they can't articulate why they'd choose you over the incumbent, you haven't built enough value yet.</div>`},
+{id:'map',stage:'m',bar:'b-purple',title:'Mutual Action Plan + Deal Momentum',subtitle:'Co-create the path to close — qualify and build accountability together',position:13,content:`<div class="lbl">Introduce the MAP</div>
+<div class="q1">"Can we take 10 minutes to map out what needs to happen between now and [target date]? I want to make sure we're not creating surprises on either side."</div>
+<div class="lbl">Build It Live — Qualify As You Go</div>
+<div class="q2">"You mentioned [date] as a goal. What's driving that timeline, and is it firm?"</div>
+<div class="q2">"What needs to happen between now and [close date] for this to actually happen?"</div>
+<div class="q2">"If this doesn't get done this quarter, what happens?"</div>
+<div class="q2">"Who needs to sign off, in what order?"</div>
+<div class="q2">"Are there board meetings, budget cycles, or internal reviews to work around?"</div>
+<div class="q2">"How long does legal/procurement review typically take — and have you started that conversation?"</div>
+<div class="q2">"What would cause this timeline to slip?"</div>
+<div class="lbl">Surface Objections Early</div>
+<div class="q2">"Based on what you've seen so far, is there anything giving you pause about moving forward with us?"</div>
+<div class="q2">"If [key stakeholder] were here, what concerns would they raise?"</div>
+<div class="lbl">Success Vision</div>
+<div class="q1">"When you picture this going live, what's the ideal outcome in the first 90 days?"</div>
+<div class="mapblock">Send the MAP document after every major call. Update it. Reference it on every call. If they stop engaging with it, that's a stall signal.</div>
+<div class="note">"If you have a plan to a place they don't want to go, they're not interested." Build it together — they need to own it as much as you do.</div>`},
+{id:'champion',stage:'m',bar:'b-green',title:'Champion Enablement + Proposal Review',subtitle:'Arm your champion to sell — then present together',position:14,content:`<div class="lbl">Enable Them Internally</div>
+<div class="q1">"What's the one thing you'd need to show the CFO/CEO/Board to get this approved?"</div>
+<div class="q1">"If you had to pitch this internally in 60 seconds, what would you say?"</div>
+<div class="q2">"What objections do you think you'll face internally? Let's prepare you for those."</div>
+<div class="q2">"Would it help if I built you a one-pager to forward to [stakeholder]?"</div>
+<div class="lbl">Proposal Review — Always Open With</div>
+<div class="q1">"Before we go through our recommendation, let me recap what we've heard and you tell me if we've got it right."</div>
+<div class="lbl">Address Each Stakeholder Directly</div>
+<div class="q2">"[CISO], we know you prioritized X. [COO], you needed Y. Let us show you how we address both."</div>
+<div class="lbl">Risk + Competing Priorities</div>
+<div class="q2">"What would prevent you from moving forward with this project?"</div>
+<div class="q2">"What other initiatives are in motion, and how does this rank?"</div>
+<div class="note">A champion who can't answer the 60-second pitch is not a real champion.</div>`},
+{id:'stalls',stage:'m',bar:'b-red',title:'Stall Handling + Going Dark',subtitle:'Don\'t send another "just checking in"',position:15,content:`<div class="lbl">Pattern Interrupt — After 14+ Days of Silence</div>
+<div class="q1">"[Name], I'm going to be transparent — I'm not sure if timing has changed or if there's something we haven't addressed. Either way, I'd rather know. Is this still a priority, or has something shifted?"</div>
+<div class="lbl">Value Drop Approach</div>
+<div class="q2">"Saw [SEC action / breach at peer firm / competitor acquisition]. Thought of your situation given what we discussed around [specific risk]."</div>
+<div class="lbl">The Hail Mary — Last Attempt</div>
+<div class="q1">"I don't want to keep reaching out if the timing isn't right. I'll assume we're on hold unless I hear otherwise. When things shift, I'm here."</div>
+<div class="note">Giving them permission to say no often re-engages them.</div>
+<div class="lbl">Common Stall Reasons</div>
+<div class="q2"><b>Budget freeze:</b> "If budget weren't a constraint, would this move forward? I want to understand if this is timing or fit."</div>
+<div class="q2"><b>Internal alignment:</b> "Who needs to get comfortable, and how can I help?"</div>
+<div class="q2"><b>Incumbent inertia:</b> "What would your current provider need to do differently for you to not make a change? I'm asking seriously."</div>
+<div class="q2"><b>Competing priorities:</b> "What's ahead of this on the list right now?"</div>
+<div class="note">Distinguish between "gone cold" (recoverable) and "dead deal" (cut it and move on).</div>`},
+{id:'competitive',stage:'m',bar:'b-gray',title:'Competitive Differentiation & Positioning',subtitle:'Understand the landscape — be honest about it',position:16,content:`<div class="lbl">Landscape Questions</div>
+<div class="q2">"What other solutions are you seriously evaluating?"</div>
+<div class="q2">"What do you see as the key differentiators between the options?"</div>
+<div class="q2">"What concerns do you have about choosing us over the alternatives?"</div>
+<div class="lbl">When Up Against a Smaller Provider — Name It First</div>
+<div class="q1">"Before we get into the proposal — you mentioned leaning toward a smaller provider because it might feel more boutique and cost-effective. That's a fair instinct. Can you tell me more about what boutique means to you in practice?"</div>
+<div class="q2">"If something breaks at 2am before a big meeting, what's the plan?"</div>
+<div class="q2">"How does a smaller generalist provider stay profitable at a lower price point? What do they cut?"</div>
+<div class="q2">"Have you asked them what their bench looks like? If your main contact leaves, who steps in?"</div>
+<div class="q2">"If an LP asked today to walk them through your security controls, how confident would you feel?"</div>`},
+
+{id:'preclosedoc',stage:'c',bar:'b-gray',title:'Pre-Close Checklist',subtitle:'Confirm every box before attempting to close',position:17,content:`<div class="lbl">Confirm All of These</div>
+<div class="q2">☐  Specific business and technical requirements documented</div>
+<div class="q2">☐  Decision criteria and relative importance confirmed</div>
+<div class="q2">☐  Decision process and approval chain mapped</div>
+<div class="q2">☐  Budget allocation and approval process confirmed</div>
+<div class="q2">☐  Implementation timeline and urgency established</div>
+<div class="q2">☐  Technical validation results captured</div>
+<div class="q2">☐  All key stakeholders engaged — multi-threaded</div>
+<div class="q2">☐  Mutual Action Plan agreed and current</div>
+<div class="lbl">Confirm Vendor of Choice Before Discussing Price</div>
+<div class="lock">"If we were at the same price point as the alternatives, would you choose us?" — If yes, negotiate. If no, you have more work to do.</div>`},
+{id:'negotiation',stage:'c',bar:'b-amber',title:'Negotiation — Give-Get Framework',subtitle:'Never give without getting. Confirm vendor of choice first.',position:18,content:`<div class="lbl">Step 1 — Confirm Vendor of Choice</div>
+<div class="q1">"Before we talk about terms — if pricing were equal across the options you're evaluating, is Abacus the direction you'd go?"</div>
+<div class="lbl">Step 2 — Lock the Timeline</div>
+<div class="q1">"If we can get to terms that work for both sides, what does the timeline to signature look like?"</div>
+<div class="lbl">Step 3 — The Give-Get</div>
+<div class="q2"><b>They ask for discount:</b> "I can look at that. If we get creative on price, can you move signature to [date]?"</div>
+<div class="q2"><b>They ask for more time:</b> "I can work with that. In exchange, can we lock scope and pricing today?"</div>
+<div class="q2"><b>They ask for contract changes:</b> "Let me take that to our team. What's your flexibility on [term] if we accommodate [their ask]?"</div>
+<div class="note">Every concession has a cost. Package pricing, terms, and conditions together so they make real choices, not endless asks.</div>
+<div class="note">If they won't confirm vendor of choice, stop negotiating — you're being used for leverage.</div>`},
+{id:'complianceclose',stage:'c',bar:'b-red',title:'Compliance Deadline Close',subtitle:'Use when driven by regulatory deadlines — SEC, NYDFS, SOX',position:19,content:`<div class="lbl">Close</div>
+<div class="lock">"To ensure compliance by [deadline], we need to begin by [date]. Are you ready to proceed?"</div>
+<div class="lbl">Script</div>
+<div class="q1">"With the [regulation] deadline approaching on [date], we've shown how our solution satisfies the requirements for [specific controls]. Based on implementation timeline, we'd need to start by [date]. Shall we move forward?"</div>
+<div class="note">Most effective close for this audience. Be specific: which regulation, which controls, which date. Work the timeline math backward from their deadline.</div>`},
+{id:'riskreduceclose',stage:'c',bar:'b-teal',title:'Risk Reduction Close',subtitle:'Use when prospect is primarily motivated by security risk',position:20,content:`<div class="lbl">Close</div>
+<div class="lock">"Based on these risks, does it make sense to proceed with implementation by [date]?"</div>
+<div class="lbl">Script</div>
+<div class="q1">"As we've discussed, your organization faces [specific risks], which expose you to potential losses of [estimated impact]. Every month of delay keeps you exposed. Would you agree moving forward by [date] is the prudent decision?"</div>
+<div class="note">Recap specific risks from discovery using their own words. Quantify the impact.</div>`},
+{id:'consensusclose',stage:'c',bar:'b-purple',title:'Consensus-Building Close',subtitle:'Use when multiple stakeholders must sign off',position:21,content:`<div class="lbl">Close</div>
+<div class="lock">"Have we addressed your requirements to move forward?"</div>
+<div class="lbl">Script</div>
+<div class="q1">"We've worked with each of you to understand your needs: [CISO] prioritized [X], [COO] needed [Y], [CCO] wanted [Z]. We've shown how we meet each of those. Have we satisfied your requirements to move forward?"</div>
+<div class="note">Ask each stakeholder individually — don't let group dynamics hide objections.</div>`},
+{id:'techvalclose',stage:'c',bar:'b-blue',title:'Technical Validation Close',subtitle:'Use when the deal hinges on a POC or technical eval',position:22,content:`<div class="lbl">Close</div>
+<div class="lock">"Now that we've validated the technical capabilities, what would prevent us from moving forward?"</div>
+<div class="lbl">Script</div>
+<div class="q1">"We've completed technical validation, confirming [key capabilities] with [performance metrics]. Your team verified we meet or exceed requirements in [areas] and integrate with [tools]. What, if anything, remains before we proceed?"</div>`},
+{id:'opeffclose',stage:'c',bar:'b-green',title:'Operational Efficiency Close',subtitle:'Use when motivated by team efficiency or resource constraints',position:23,content:`<div class="lbl">Close</div>
+<div class="lock">"Based on these gains, does it make sense to move forward with the initial deployment?"</div>
+<div class="lbl">Script</div>
+<div class="q1">"Your team currently spends [X] hours per week on [manual process] and has [Y] incidents in backlog. We've demonstrated a [Z%] reduction through automation, giving you back [#] hours per week. Would you agree it makes sense to proceed?"</div>`},
+{id:'incumbentclose',stage:'c',bar:'b-amber',title:'Incumbent Displacement Close',subtitle:'Use when replacing an entrenched provider',position:24,content:`<div class="lbl">Surface the Switching Cost Objection First</div>
+<div class="q1">"I want to acknowledge something directly — switching providers is never trivial. There's migration risk, transition time, and the question of whether the grass is actually greener. I'd rather address that now than have it sit unspoken."</div>
+<div class="lbl">Reframe the Risk</div>
+<div class="q2">"The question isn't whether switching has a cost. It does. The question is whether staying has a higher one — given everything you've described about [specific pain]."</div>
+<div class="q2">"What's the cost of another 12 months of the status quo — in time, in risk exposure, in the things your team isn't building?"</div>
+<div class="lbl">Close</div>
+<div class="lock">"Based on everything we've discussed, is the risk of staying higher than the risk of moving? Because that's really what we're deciding."</div>`}
+];
+
+loadSections();
+</script>
+</body>
+</html>
