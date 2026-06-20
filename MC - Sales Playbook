@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monte Carlo — Deal & Discovery Framework</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0B1437;--navy2:#111B45;--navy3:#1A2756;
+  --blue:#3B6FF5;--blue-l:#5B8DEF;--blue-bg:rgba(59,111,245,0.10);--blue-br:rgba(59,111,245,0.30);
+  --ink:#0B1437;--paper:#FBFCFE;--card:#FFFFFF;
+  --tx:#1A2138;--tx2:#5A6480;--tx3:#8A94AC;
+  --border:#E4E9F2;--border2:#EDF1F7;
+  --green:#0EA46A;--green-bg:rgba(14,164,106,0.10);--green-br:rgba(14,164,106,0.28);
+  --amber:#E8911A;--amber-bg:rgba(232,145,26,0.10);--amber-br:rgba(232,145,26,0.28);
+  --red:#E5484D;--red-bg:rgba(229,72,77,0.09);--red-br:rgba(229,72,77,0.26);
+  --purple:#8B5CF6;--purple-bg:rgba(139,92,246,0.10);--purple-br:rgba(139,92,246,0.28);
+  --teal:#0D9488;--teal-bg:rgba(13,148,136,0.10);--teal-br:rgba(13,148,136,0.28);
+}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--tx);line-height:1.6;padding-bottom:150px;-webkit-font-smoothing:antialiased}
+.page{max-width:1000px;margin:0 auto;padding:0 20px}
+
+/* HEADER */
+.masthead{padding:26px 0 18px;border-bottom:1px solid var(--border)}
+.mast-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),#2952C8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-mark svg{width:22px;height:22px}
+.brand h1{font-size:19px;font-weight:800;letter-spacing:-0.02em;color:var(--ink)}
+.brand p{font-size:11px;color:var(--tx3);font-family:'Space Mono',monospace;letter-spacing:0.04em;margin-top:1px}
+.mast-tag{font-size:11px;color:var(--tx2);font-family:'Space Mono',monospace;background:var(--blue-bg);border:1px solid var(--blue-br);padding:5px 11px;border-radius:20px}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin:18px 0 22px;background:var(--navy);padding:5px;border-radius:14px;position:sticky;top:10px;z-index:40;box-shadow:0 4px 20px rgba(11,20,55,0.10)}
+.tab{flex:1;padding:11px 14px;border-radius:10px;border:none;background:transparent;color:#9AA6C8;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.tab:hover{color:#C8D2EC}
+.tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(59,111,245,0.4)}
+.tab .tnum{font-family:'Space Mono',monospace;font-size:10px;opacity:0.6}
+
+.panel{display:none;animation:fade 0.3s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION TITLES */
+.sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--tx3);margin:22px 0 12px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* COM OVERLAY STRIP */
+.com-overlay{background:var(--navy);border-radius:14px;padding:16px 18px;margin-bottom:20px}
+.com-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.com-head .ch-label{font-family:'Space Mono',monospace;font-size:10px;color:#7C88AE;letter-spacing:0.08em;text-transform:uppercase}
+.com-head .ch-sub{font-size:10px;color:#5C679000;color:#6B7596}
+.com-track{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:4px}
+.com-step{flex:1;min-width:96px;text-align:center;padding:10px 6px;border-radius:9px;position:relative;cursor:default}
+.com-step .cs-abbr{font-size:12px;font-weight:700;color:#E8EDFA;display:block;letter-spacing:0.02em}
+.com-step .cs-name{font-size:9px;color:#7C88AE;display:block;margin-top:3px;line-height:1.3}
+.com-arrow{display:flex;align-items:center;color:#36406B;font-size:13px;flex-shrink:0}
+.com-step.lit{background:var(--blue-bg)}
+.com-step.lit .cs-abbr{color:var(--blue-l)}
+
+/* STAGE CARDS */
+.stage-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;transition:box-shadow 0.18s,border-color 0.18s}
+.stage-card:hover{border-color:#D2DAE8}
+.stage-card.open{border-color:var(--blue-br);box-shadow:0 6px 24px rgba(59,111,245,0.08)}
+.stage-head{padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
+.stage-step-badge{width:30px;height:30px;border-radius:9px;background:var(--blue-bg);border:1px solid var(--blue-br);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue);flex-shrink:0;font-family:'Space Mono',monospace}
+.stage-head-text{flex:1}
+.stage-name{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.stage-goal{font-size:12px;color:var(--tx2);margin-top:1px}
+.stage-toggle{font-size:20px;color:var(--tx3);transition:transform 0.22s;flex-shrink:0}
+.stage-card.open .stage-toggle{transform:rotate(45deg);color:var(--blue)}
+.stage-body{display:none;padding:0 18px 18px}
+.stage-card.open .stage-body{display:block}
+.stage-meta{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding-top:14px;border-top:1px solid var(--border2)}
+
+/* FRAMEWORK CHIPS */
+.chip{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:0.02em;border:1px solid}
+.chip-spin{background:var(--teal-bg);color:#0B7A70;border-color:var(--teal-br)}
+.chip-chal{background:var(--purple-bg);color:#6D38D6;border-color:var(--purple-br)}
+.chip-med{background:var(--blue-bg);color:#2952C8;border-color:var(--blue-br)}
+.chip-voss{background:var(--red-bg);color:#C13539;border-color:var(--red-br)}
+.chip-com{background:var(--navy);color:#C8D2EC;border-color:#36406B}
+
+/* SUBSECTIONS within stage */
+.sub{margin-top:16px}
+.sub-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);margin-bottom:8px}
+ul.pts{list-style:none;padding:0}
+ul.pts li{font-size:13.5px;padding:6px 0;line-height:1.55;color:var(--tx);display:flex;gap:9px;align-items:flex-start}
+ul.pts li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:8px}
+ul.pts li strong{font-weight:700}
+
+/* QUESTION CARD */
+.qcard{background:var(--blue-bg);border:1px solid var(--blue-br);border-radius:10px;padding:11px 13px;margin:8px 0;font-size:13.5px;line-height:1.55;color:var(--tx);position:relative}
+.qcard .q-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue);display:block;margin-bottom:4px;font-family:'Space Mono',monospace}
+.qcard .q-why{font-size:11.5px;color:var(--tx2);margin-top:6px;line-height:1.5;font-style:italic}
+
+/* VERBATIM / INSIGHT box */
+.vbox{background:var(--navy);border-radius:11px;padding:14px 16px;margin:10px 0;font-size:13.5px;line-height:1.7;color:#DDE4F4;font-style:italic}
+.vbox .v-tag{font-family:'Space Mono',monospace;font-size:9px;color:#7C88AE;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px;font-style:normal;display:block}
+.vbox.insight{border-left:3px solid var(--blue)}
+
+/* MEDDPICC ROW */
+.medd{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:6px 0}
+.mcell{text-align:center;padding:8px 3px;border-radius:8px;border:1px solid var(--border);background:var(--paper);font-size:11px;font-weight:800;color:var(--tx3);font-family:'Space Mono',monospace}
+.mcell .ml{font-size:8px;font-weight:500;color:var(--tx3);display:block;margin-top:2px;font-family:'Inter',sans-serif;letter-spacing:0}
+.mcell.on{background:var(--blue-bg);border-color:var(--blue-br);color:var(--blue)}
+.mcell.on .ml{color:var(--blue)}
+
+/* POPOUT (multi-thread pitfalls) */
+.popout-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-br);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
+.popout-btn:hover{background:var(--blue);color:#fff}
+.popout{display:none;margin-top:10px;background:var(--paper);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+.popout.open{display:block}
+
+/* PERSONA CARDS */
+.persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:720px){.persona-grid{grid-template-columns:1fr}}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:box-shadow 0.18s,border-color 0.18s}
+.pcard:hover{border-color:#D2DAE8;box-shadow:0 6px 20px rgba(11,20,55,0.06)}
+.pcard-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none}
+.pcard-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:800;color:#fff}
+.pic-cdo{background:linear-gradient(135deg,#3B6FF5,#2952C8)}
+.pic-de{background:linear-gradient(135deg,#0EA46A,#0A7D50)}
+.pic-vp{background:linear-gradient(135deg,#8B5CF6,#6D38D6)}
+.pic-ciso{background:linear-gradient(135deg,#E5484D,#C13539)}
+.pic-cto{background:linear-gradient(135deg,#E8911A,#C2740F)}
+.pcard-ht{flex:1}
+.pcard-role{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.2}
+.pcard-tag{font-size:11px;color:var(--tx2);margin-top:1px}
+.pcard-tog{font-size:18px;color:var(--tx3);transition:transform 0.2s}
+.pcard.open .pcard-tog{transform:rotate(45deg);color:var(--blue)}
+.pcard-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border2)}
+.pcard.open .pcard-body{display:block}
+.pstat{background:var(--navy);border-radius:10px;padding:11px 13px;margin:12px 0;display:flex;align-items:center;gap:12px}
+.pstat-num{font-size:24px;font-weight:800;color:var(--blue-l);letter-spacing:-0.02em;line-height:1;flex-shrink:0}
+.pstat-tx{font-size:11px;color:#B8C2DE;line-height:1.4}
+.pblock{margin-top:12px}
+.pblock-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px}
+.pl-pain{color:var(--red)}.pl-press{color:var(--amber)}.pl-pbo{color:var(--green)}.pl-lang{color:var(--blue)}
+ul.psmall{list-style:none;padding:0}
+ul.psmall li{font-size:12.5px;padding:3px 0;line-height:1.5;color:var(--tx2);display:flex;gap:7px;align-items:flex-start}
+ul.psmall li::before{content:"–";color:var(--tx3);flex-shrink:0}
+.lang-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.lang-pill{font-size:10.5px;padding:3px 9px;border-radius:14px;background:var(--blue-bg);color:#2952C8;border:1px solid var(--blue-br);font-weight:600}
+
+/* DUAL PERSONA */
+.dual{background:linear-gradient(135deg,var(--navy),var(--navy3));border-radius:14px;padding:18px;margin-top:16px;color:#fff}
+.dual h3{font-size:14px;font-weight:700;margin-bottom:6px;color:#fff}
+.dual p{font-size:12.5px;color:#B8C2DE;line-height:1.6;margin-bottom:10px}
+.dual .transition{background:rgba(255,255,255,0.06);border-left:2px solid var(--blue);border-radius:0 8px 8px 0;padding:9px 12px;margin-top:8px;font-size:12px;color:#DDE4F4;font-style:italic;line-height:1.55}
+.dual .transition .tt-l{font-family:'Space Mono',monospace;font-size:9px;color:#7C88AE;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:4px;font-style:normal}
+
+/* NARRATIVE — why now stories */
+.story-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+@media(max-width:720px){.story-grid{grid-template-columns:1fr}}
+.story{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:15px;position:relative;overflow:hidden}
+.story::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
+.story.red::before{background:var(--red)}
+.story.amber::before{background:var(--amber)}
+.story.blue::before{background:var(--blue)}
+.story-num{font-size:25px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:3px}
+.story.red .story-num{color:var(--red)}
+.story.amber .story-num{color:var(--amber)}
+.story.blue .story-num{color:var(--blue)}
+.story-co{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.story-tx{font-size:12px;color:var(--tx2);line-height:1.55}
+.story-src{font-size:9.5px;color:var(--tx3);font-family:'Space Mono',monospace;margin-top:8px}
+
+/* ROOT CAUSES */
+.root-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px}
+@media(max-width:600px){.root-grid{grid-template-columns:1fr}}
+.root{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.root-n{width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;font-family:'Space Mono',monospace}
+.root-t .rt-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.root-t .rt-x{font-size:12px;color:var(--tx2);line-height:1.5}
+
+/* FEATURE INSIGHT (Barr Moses) */
+.feat{background:linear-gradient(135deg,var(--navy),#16224F);border-radius:16px;padding:22px;margin:18px 0;position:relative;overflow:hidden}
+.feat::after{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(59,111,245,0.18),transparent 70%)}
+.feat-q{font-family:'Space Mono',monospace;font-size:10px;color:var(--blue-l);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;position:relative}
+.feat-h{font-size:18px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:10px;letter-spacing:-0.01em;position:relative}
+.feat-tx{font-size:13.5px;color:#C8D2EC;line-height:1.7;position:relative}
+.feat-tx strong{color:#fff;font-weight:600}
+.feat-attr{font-size:11px;color:#7C88AE;margin-top:12px;font-style:italic;position:relative}
+
+/* PITCH / DIFFERENTIATION */
+.pitch-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.pitch-card h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.pitch-lead{font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:10px}
+
+/* COMPETITIVE TABLE */
+.comp-row{display:grid;grid-template-columns:130px 1fr;gap:1px;background:var(--border);border-radius:11px;overflow:hidden;margin-bottom:8px;border:1px solid var(--border)}
+.comp-cell{background:var(--card);padding:11px 13px}
+.comp-vs{font-weight:700;font-size:12.5px;color:var(--ink);display:flex;align-items:center}
+.comp-pos{font-size:12.5px;color:var(--tx2);line-height:1.55}
+.comp-pos strong{color:var(--tx);font-weight:600}
+
+/* FIXED FOOTER — macro questions */
+.macro-footer{position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:2px solid var(--blue);z-index:60;padding:11px 20px;max-height:130px;overflow:hidden;transition:max-height 0.25s}
+.macro-inner{max-width:1000px;margin:0 auto}
+.macro-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.macro-label{font-family:'Space Mono',monospace;font-size:9px;color:#7C88AE;letter-spacing:0.09em;text-transform:uppercase}
+.macro-toggle{background:var(--blue-bg);border:1px solid var(--blue-br);color:var(--blue-l);font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif}
+.macro-q-row{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+@media(max-width:760px){.macro-q-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:440px){.macro-q-row{grid-template-columns:repeat(2,1fr)}}
+.macro-q{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 10px;cursor:default;transition:background 0.15s}
+.macro-q:hover{background:var(--blue-bg);border-color:var(--blue-br)}
+.macro-q .mq-n{font-family:'Space Mono',monospace;font-size:9px;color:var(--blue-l);display:block;margin-bottom:2px}
+.macro-q .mq-t{font-size:11px;font-weight:600;color:#E8EDFA;line-height:1.25}
+.macro-q .mq-s{font-size:9.5px;color:#7C88AE;margin-top:2px;line-height:1.3;display:block}
+.macro-footer.collapsed{max-height:34px}
+.macro-footer.collapsed .macro-q-row{display:none}
+
+.intro-note{font-size:12.5px;color:var(--tx2);line-height:1.6;background:var(--blue-bg);border:1px solid var(--blue-br);border-radius:11px;padding:13px 15px;margin-bottom:18px}
+.intro-note strong{color:var(--tx);font-weight:700}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="mast-top">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 17l5-5 4 3 6-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="6" r="2" fill="#fff"/></svg>
+      </div>
+      <div>
+        <h1>Monte Carlo — Deal & Discovery Framework</h1>
+        <p>Command of the Message · MEDDPICC · SPIN · Challenger</p>
+      </div>
+    </div>
+    <div class="mast-tag">Live-on-call engine</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('deal',this)"><span class="tnum">01</span>The Deal</button>
+  <button class="tab" onclick="showTab('buyers',this)"><span class="tnum">02</span>The Buyers</button>
+  <button class="tab" onclick="showTab('narrative',this)"><span class="tnum">03</span>The Narrative</button>
+</div>
+
+<!-- ══════════════════════ TAB 1: THE DEAL ══════════════════════ -->
+<div id="tab-deal" class="panel active">
+
+  <div class="intro-note">
+    <strong>How to use this tab.</strong> Five stages, left to right, from first meeting to close. Command of the Message runs underneath all of them — the strip below shows where each stage sits. Click any stage to open the question engine, the insight to deliver, and what you're qualifying. The six macro questions pinned at the bottom are what every conversation must answer.
+  </div>
+
+  <!-- COM OVERLAY -->
+  <div class="com-overlay">
+    <div class="com-head">
+      <span class="ch-label">Command of the Message — running underneath every stage</span>
+    </div>
+    <div class="com-track">
+      <div class="com-step lit"><span class="cs-abbr">BAU</span><span class="cs-name">Current pain, their words</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">INSIGHT</span><span class="cs-name">Challenger reframe</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">PBO</span><span class="cs-name">Future state</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">METRICS</span><span class="cs-name">Quantify the gap</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">REQ CAP</span><span class="cs-name">What must be true</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">PROOF</span><span class="cs-name">The POC</span></div>
+      <div class="com-arrow">→</div>
+      <div class="com-step lit"><span class="cs-abbr">CONTRACT</span><span class="cs-name">BAU cost vs invest</span></div>
+    </div>
+  </div>
+
+  <!-- STAGE 1: DISCOVER -->
+  <div class="stage-card open">
+    <div class="stage-head" onclick="toggleStage(this)">
+      <div class="stage-step-badge">01</div>
+      <div class="stage-head-text">
+        <div class="stage-name">Discover</div>
+        <div class="stage-goal">Surface BAU, quantify the pain, land the insight</div>
+      </div>
+      <span class="stage-toggle">+</span>
+    </div>
+    <div class="stage-body">
+      <div class="stage-meta">
+        <span class="chip chip-com">CoM: BAU → Insight</span>
+        <span class="chip chip-spin">SPIN: full ladder</span>
+        <span class="chip chip-chal">Challenger insight</span>
+        <span class="chip chip-voss">Voss: labels + calibrated Q's</span>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Open — the upfront contract (first 60 seconds)</div>
+        <div class="vbox">
+          <span class="v-tag">Say this before any question</span>
+          "Thanks for the time today. As a loose agenda, I'd love to spend most of this understanding your data environment, the AI initiatives you're building on top of it, and where things break down or need to improve. I can infer from public information, but I don't want to assume. If we feel we can help, we can talk about what that looks like and next steps if there's alignment. Sound good?"
+        </div>
+        <ul class="pts">
+          <li>Signals you won't pitch immediately, and gives them permission to say it's not a fit — which makes them engage more.</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Situation — understand the environment</div>
+        <div class="qcard">
+          <span class="q-tag">Situation</span>
+          "Walk me through your current data infrastructure at a high level — primary warehouses, transformation layer, what you're using for orchestration?"
+          <div class="q-why">Listening for Snowflake, dbt, Airflow. If they name them, you have instant credibility and integration footing.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Situation · the pivot question</span>
+          "Do you have monitoring or observability in place today specifically for data quality — as distinct from infrastructure monitoring?"
+          <div class="q-why">Almost everyone says Datadog or Grafana — which watches the application layer, not the data layer. That's the gap. If they say "not really," the door is open.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Problem — surface where it breaks</div>
+        <div class="qcard">
+          <span class="q-tag">Problem · the most important question</span>
+          "When a data pipeline breaks or produces incorrect data — how does your team typically find out?"
+          <div class="q-why">The answer is almost always "the business tells us." That's BAU in one sentence. Let them say it. Don't finish it for them. Then label it: "So the business becomes the alert system."</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Problem · the debugging burden</span>
+          "Walk me through what the investigation looks like — from 'something's wrong' to 'we know what broke and why.' What does that process actually look like?"
+          <div class="q-why">Surfaces the manual archaeology, the on-call stress. Quantifies the operational cost of BAU.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Problem · get the metric</span>
+          "How much of your data engineering team's week goes toward debugging and firefighting versus building new capabilities?"
+          <div class="q-why">Industry average is ~40%. When they confirm a number, they've quantified BAU in their own words. That's your business-case input.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Problem · the dbt-coverage gap</span>
+          "Do you find there are scenarios your dbt tests weren't scripted to catch that the team finds out about after the fact? Particularly distribution — where the values were there, the row count was right, but a number was off in a way nobody wrote a rule for. Like volatility showing 0.02% instead of 15% because a decimal dropped."
+          <div class="q-why">Specific example makes the gap concrete. Separates rules-you-defined from anomalies-you-didn't-anticipate.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Implication — connect to business + regulatory impact</div>
+        <div class="qcard">
+          <span class="q-tag">Implication</span>
+          "When data problems reach the business before your team catches them — what's the downstream impact? Analyst productivity, wrong decisions, or something with regulatory weight?"
+          <div class="q-why">Shifts from operational pain to business consequence. The CDO's ears perk up here.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Implication · regulated-firm specific</span>
+          "What's the exposure if a data quality issue propagates into a NAV calculation, a risk model output, or a regulatory submission before it's caught?"
+          <div class="q-why">Names their actual consequences without making it an attack. The CDO usually takes this one.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Implication · agent trust pivot</span>
+          "You mentioned AI systems supporting your teams. How confident are you in the quality of the data those systems pull from — is that a known risk or an assumed risk?"
+          <div class="q-why">"Assumed risk" vs "known risk" is the power distinction. Most admit it's assumed. Opens the agent-trust conversation — MC's newest, most defensible territory.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Need-payoff — make them describe the future</div>
+        <div class="qcard">
+          <span class="q-tag">Need-payoff</span>
+          "If your team had automated visibility into data issues before the business ever felt them — what would that change operationally?"
+          <div class="q-why">Never describe the future for them. When the data engineer says "we could build instead of firefight" — that's their PBO in their words.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Need-payoff · AI layer</span>
+          "What would it mean to have a layer that could trace a bad AI output back to the exact data pipeline that caused it?"
+          <div class="q-why">When the CDO says "I could give the board a defensible answer" — that's their PBO. Reference these exact phrases for the rest of the cycle.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The insight — deliver after implication lands</div>
+        <div class="vbox insight">
+          <span class="v-tag">Challenger reframe — then go quiet</span>
+          "What we see consistently at your scale is that the gap isn't about tools or coverage — it's about the layer. Job-level monitoring tells you whether your pipelines ran. It tells you nothing about whether the output is trustworthy. And that's where the PM ends up being the alert system."
+          <br><br>Then: "Does that resonate with how you're experiencing it?"
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Qualifying in real time — MEDDPICC targets for discovery</div>
+        <div class="medd">
+          <div class="mcell on">M<span class="ml">Metrics</span></div>
+          <div class="mcell on">E<span class="ml">Econ Buyer</span></div>
+          <div class="mcell">D<span class="ml">Dec Crit</span></div>
+          <div class="mcell">D<span class="ml">Dec Proc</span></div>
+          <div class="mcell">P<span class="ml">Paper</span></div>
+          <div class="mcell on">I<span class="ml">Pain</span></div>
+          <div class="mcell on">C<span class="ml">Champion</span></div>
+          <div class="mcell on">C<span class="ml">Competition</span></div>
+        </div>
+        <ul class="pts">
+          <li><strong>Realistic for a first call:</strong> land M, I, and partial C. You're not closing in one call — you're earning the technical validation.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: VALIDATE -->
+  <div class="stage-card">
+    <div class="stage-head" onclick="toggleStage(this)">
+      <div class="stage-step-badge">02</div>
+      <div class="stage-head-text">
+        <div class="stage-name">Validate</div>
+        <div class="stage-goal">Map capabilities to stated pain — technical validation, not a feature dump</div>
+      </div>
+      <span class="stage-toggle">+</span>
+    </div>
+    <div class="stage-body">
+      <div class="stage-meta">
+        <span class="chip chip-com">CoM: Required Capabilities</span>
+        <span class="chip chip-med">MEDDPICC: D / D</span>
+        <span class="chip chip-chal">Tailor + take control</span>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The rule</div>
+        <ul class="pts">
+          <li>Only present capabilities <strong>after</strong> pain is acknowledged and the insight landed. Features without outcome context are noise.</li>
+          <li>Map each capability to a problem <strong>they</strong> named in discovery. "You mentioned X — here's how that's addressed."</li>
+          <li>This is a technical validation conversation, not a demo. The demo earns the POC; it doesn't replace discovery.</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Required capabilities — tied to the pain they'll have surfaced</div>
+        <ul class="pts">
+          <li><strong>ML detection across all 5 pillars</strong> (freshness, volume, distribution, schema, lineage) — no manual rule-writing at scale → answers the dbt-coverage gap.</li>
+          <li><strong>Full lineage</strong> source → Snowflake → every downstream dashboard, model, report → answers "who finds out first" and the debugging burden.</li>
+          <li><strong>Reads metadata, not data</strong> — fits inside their security perimeter → answers the regulated-data privacy concern.</li>
+          <li><strong>Native stack integration</strong> — Snowflake, dbt, Airflow, Tableau → answers "will this create more work."</li>
+          <li><strong>Agent monitoring layer</strong> — AI outputs traced back to data quality → answers the assumed-risk admission.</li>
+          <li><strong>Fast time to value</strong> — first detections in days → answers "how long until this matters."</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Validation questions — confirm fit, expose decision mechanics</div>
+        <div class="qcard">
+          <span class="q-tag">Decision criteria</span>
+          "As you evaluate something like this, what would 'good' need to look like — integration depth, time to value, detection accuracy, something else?"
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Decision process</span>
+          "If a technical validation went well, walk me through what the path from there to a decision looks like inside your organization."
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Change mechanics (Vanguard POV ladder)</span>
+          "How does a capability like this get evaluated, funded, secured, and adopted here?"
+          <div class="q-why">One question that surfaces decision process, paper process, and security review all at once.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: PROVE -->
+  <div class="stage-card">
+    <div class="stage-head" onclick="toggleStage(this)">
+      <div class="stage-step-badge">03</div>
+      <div class="stage-head-text">
+        <div class="stage-name">Prove</div>
+        <div class="stage-goal">The POC — agree on success criteria before you start</div>
+      </div>
+      <span class="stage-toggle">+</span>
+    </div>
+    <div class="stage-body">
+      <div class="stage-meta">
+        <span class="chip chip-com">CoM: Proof</span>
+        <span class="chip chip-med">MEDDPICC: M / Champion</span>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The single most important POC question</div>
+        <div class="vbox insight">
+          <span class="v-tag">Establish before any eval begins</span>
+          "What would need to be true at the end of a 30-day evaluation for you to feel confident this is worth the investment?"
+          <br><br>Whatever they say becomes the success criteria. Build the POC to prove exactly that.
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The POC motion — what it actually looks like</div>
+        <ul class="pts">
+          <li><strong>Week 1:</strong> Connect to Snowflake. MC reads metadata, builds baselines. No data leaves the environment, no sensitive data accessed.</li>
+          <li><strong>Week 2:</strong> First anomaly detections surface — stale tables, volume deviations, schema changes the team didn't know about or was hearing about from the business.</li>
+          <li><strong>Weeks 2–4:</strong> Lineage maps build out. Team sees the full dependency picture and downstream blast radius.</li>
+          <li><strong>End of POC:</strong> Point to specific incidents MC caught before the business felt them. That's the proof — real issues in their real environment, not a demo.</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Why the proof is structurally strong</div>
+        <ul class="pts">
+          <li>The proof isn't a slide — it's MC finding problems they didn't know they had. That's almost impossible to argue with.</li>
+          <li>Get the champion to co-own the success criteria so the win is theirs to present internally.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 4: MULTI-THREAD -->
+  <div class="stage-card">
+    <div class="stage-head" onclick="toggleStage(this)">
+      <div class="stage-step-badge">04</div>
+      <div class="stage-head-text">
+        <div class="stage-name">Multi-thread</div>
+        <div class="stage-goal">Map the committee, secure EB access, keep everyone looped in early</div>
+      </div>
+      <span class="stage-toggle">+</span>
+    </div>
+    <div class="stage-body">
+      <div class="stage-meta">
+        <span class="chip chip-med">MEDDPICC: E / Champion</span>
+        <span class="chip chip-com">CoM: keep BAU + metrics alive</span>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The principle</div>
+        <ul class="pts">
+          <li><strong>Champion ≠ economic buyer.</strong> At enterprise scale the data engineer or VP Data is your champion; the CDO (or CTO above them) signs. Know which is which.</li>
+          <li><strong>Champion test:</strong> can they sell when you're not in the room? Will they set up the EB call? If not, they're a coach.</li>
+          <li><strong>Map every stakeholder in the first two meetings.</strong> For each: what's their pain, their decision criteria, what would make them say no.</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Securing EB access — the calibrated ask</div>
+        <div class="vbox">
+          <span class="v-tag">Not a demand — a partnership requirement</span>
+          "To make sure what I'm building actually addresses your leadership's priorities, I need to understand them directly. What does that path look like?"
+        </div>
+      </div>
+
+      <button class="popout-btn" onclick="togglePop(this)">⚠ Common pitfalls & how to overcome — open</button>
+      <div class="popout">
+        <div class="sub" style="margin-top:0">
+          <div class="sub-label" style="color:var(--red)">Pitfall #1 — Blocked from the EB at the final stage</div>
+          <ul class="pts">
+            <li><strong>The trap:</strong> You run the whole cycle with the champion, then at decision time you've never met the person who signs. Resources extracted, EB dark, deal stalls or dies. (The Pantera / CardWorks lesson.)</li>
+            <li><strong>The fix — loop the EB in early.</strong> From the first POC update, include the EB on a brief weekly/bi-weekly status email. Even if they never reply, they're absorbing progress, pain, and metrics. By decision time you're a known quantity, not a stranger.</li>
+            <li><strong>"Act as if."</strong> Operate from the first meeting as though the EB is already part of the deal — reference their priorities, address their concerns in your updates, make the champion comfortable forwarding upward.</li>
+            <li><strong>Why it works:</strong> Free extraction trains champions that asking costs nothing. Establishing give-and-take early — and keeping the EB visible — changes the dynamic from vendor evaluation to partnership.</li>
+          </ul>
+        </div>
+        <div class="sub">
+          <div class="sub-label" style="color:var(--green)">What a good status update contains</div>
+          <ul class="pts">
+            <li><strong>Pain</strong> — the problem in their own words, restated.</li>
+            <li><strong>Progress</strong> — what the POC / eval has surfaced so far.</li>
+            <li><strong>Criteria</strong> — the success criteria they defined, and status against each.</li>
+            <li><strong>Metrics</strong> — quantified findings (issues caught, time saved, coverage gained).</li>
+            <li><strong>Tied to business objectives</strong> — connect every update back to the initiative and outcome leadership actually cares about, not the tooling.</li>
+          </ul>
+        </div>
+        <div class="sub">
+          <div class="sub-label" style="color:var(--red)">Pitfall #2 — Single-threaded on the champion</div>
+          <ul class="pts">
+            <li><strong>The trap:</strong> One relationship, one point of failure. Champion changes roles, goes quiet, or loses influence — deal collapses.</li>
+            <li><strong>The fix:</strong> Use the champion to make introductions. A real champion opens doors; a coach can't. Their willingness to multi-thread you is itself the champion test.</li>
+          </ul>
+        </div>
+        <div class="sub">
+          <div class="sub-label" style="color:var(--red)">Pitfall #3 — Competitor surfaces late</div>
+          <ul class="pts">
+            <li><strong>The trap:</strong> A rival shows up in the final third and you're caught flat. (The Vertex MSSP, the platform-native pitch.)</li>
+            <li><strong>The fix:</strong> Inoculate early. "If a platform-native option or an internal-build proposal surfaces later, what would concern you most?" Plant the frame before the competitor arrives.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sub" style="margin-top:16px">
+        <div class="sub-label">Multi-thread MEDDPICC focus</div>
+        <div class="medd">
+          <div class="mcell on">M<span class="ml">Metrics</span></div>
+          <div class="mcell on">E<span class="ml">Econ Buyer</span></div>
+          <div class="mcell on">D<span class="ml">Dec Crit</span></div>
+          <div class="mcell on">D<span class="ml">Dec Proc</span></div>
+          <div class="mcell on">P<span class="ml">Paper</span></div>
+          <div class="mcell on">I<span class="ml">Pain</span></div>
+          <div class="mcell on">C<span class="ml">Champion</span></div>
+          <div class="mcell on">C<span class="ml">Competition</span></div>
+        </div>
+        <ul class="pts">
+          <li>By end of multi-thread, every element should be filled. A blank element is where the deal is exposed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 5: CLOSE -->
+  <div class="stage-card">
+    <div class="stage-head" onclick="toggleStage(this)">
+      <div class="stage-step-badge">05</div>
+      <div class="stage-head-text">
+        <div class="stage-name">Close</div>
+        <div class="stage-goal">Make the cost of staying in BAU obvious — surface urgency, don't manufacture it</div>
+      </div>
+      <span class="stage-toggle">+</span>
+    </div>
+    <div class="stage-body">
+      <div class="stage-meta">
+        <span class="chip chip-com">CoM: BAU → Contract</span>
+        <span class="chip chip-med">MEDDPICC: all confirmed</span>
+        <span class="chip chip-voss">Voss: calibrated close</span>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">The BAU-to-contract frame</div>
+        <div class="vbox">
+          <span class="v-tag">Quantify the gap, then let it sit</span>
+          "You mentioned your engineers spend ~30% of their week on firefighting. Across the team that's [X] headcount-years a year. Add the cost of one incident that reaches a regulatory filing or a client. That's the cost of staying where you are. The question is whether that number justifies eliminating it."
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Surfacing urgency — without manufacturing it</div>
+        <ul class="pts">
+          <li>Urgency is already in the deal. Tie it to their stated timeline — an AI program launch, an exam, a board cycle, a modernization milestone.</li>
+          <li><strong>Calibrated:</strong> "What does it look like for your team if this slips to next quarter?" lands harder than "we need to close by Q3." When they say the cost of delay, they own it.</li>
+          <li><strong>Mutual action plan:</strong> jointly built milestones. When the deal drifts, reconnect to the plan you built together — not pressure you apply.</li>
+        </ul>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Final MEDDPICC confirmation — if any cell is blank, it's not closeable</div>
+        <div class="medd">
+          <div class="mcell on">M<span class="ml">Quantified</span></div>
+          <div class="mcell on">E<span class="ml">Accessed</span></div>
+          <div class="mcell on">D<span class="ml">Known</span></div>
+          <div class="mcell on">D<span class="ml">Mapped</span></div>
+          <div class="mcell on">P<span class="ml">Clear</span></div>
+          <div class="mcell on">I<span class="ml">Owned</span></div>
+          <div class="mcell on">C<span class="ml">Selling</span></div>
+          <div class="mcell on">C<span class="ml">Positioned</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════ TAB 2: THE BUYERS ══════════════════════ -->
+<div id="tab-buyers" class="panel">
+
+  <div class="intro-note">
+    <strong>How to use this tab.</strong> Five personas you'll meet in a Monte Carlo deal. Each opens to show the pressure they're under, their core pain, their PBO, and the language that resonates. Same underlying problem — data reliability — experienced and described five different ways. The dual-persona section at the bottom is for the CDO-and-data-engineer-in-the-same-room dynamic.
+  </div>
+
+  <div class="persona-grid">
+
+    <!-- CDO -->
+    <div class="pcard">
+      <div class="pcard-head" onclick="togglePersona(this)">
+        <div class="pcard-ic pic-cdo">DC</div>
+        <div class="pcard-ht">
+          <div class="pcard-role">CDO — Chief Data Officer</div>
+          <div class="pcard-tag">Economic buyer · governance & board accountability</div>
+        </div>
+        <span class="pcard-tog">+</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pstat">
+          <div class="pstat-num">⅓</div>
+          <div class="pstat-tx">Nearly 100% of firms are working on AI — but only about one-third actually trust their data. The CDO owns that gap.</div>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-press">Pressure they're under</div>
+          <ul class="psmall">
+            <li>Accountable to the board and regulators for data trustworthiness across the whole firm</li>
+            <li>Governing thousands of tables, hundreds of engineers, dozens of sources — beyond manual oversight</li>
+            <li>An evolving regulatory environment putting data + AI governance under the microscope</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pain">Core pain</div>
+          <ul class="psmall">
+            <li>Doesn't know if data is reliable — hopes it is, finds out it isn't when a PM complains or a filing is amended</li>
+            <li>Policy exists; systematic enforcement underneath it doesn't</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pbo">PBO — what they buy</div>
+          <ul class="psmall">
+            <li>"Tell the board, regulators, and leadership that data quality is actively managed, monitored, and auditable — not just hoped for." They buy confidence.</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-lang">Their language</div>
+          <div class="lang-pills">
+            <span class="lang-pill">governance</span><span class="lang-pill">auditability</span><span class="lang-pill">regulatory compliance</span><span class="lang-pill">AI confidence</span><span class="lang-pill">board reporting</span><span class="lang-pill">data trust</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA ENGINEER -->
+    <div class="pcard">
+      <div class="pcard-head" onclick="togglePersona(this)">
+        <div class="pcard-ic pic-de">DE</div>
+        <div class="pcard-ht">
+          <div class="pcard-role">Data Engineer / Head of Data Eng</div>
+          <div class="pcard-tag">Champion · operational pain owner</div>
+        </div>
+        <span class="pcard-tog">+</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pstat">
+          <div class="pstat-num">40%</div>
+          <div class="pstat-tx">Of the average data engineering week goes to debugging and firefighting pipeline failures — time that should be spent building.</div>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-press">Pressure they're under</div>
+          <ul class="psmall">
+            <li>On-call burden — gets paged at 2am when a dashboard is wrong</li>
+            <li>Gets blamed when data breaks, even if it originated upstream from a vendor file</li>
+            <li>Always one silent pipeline failure away from a crisis</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pain">Core pain</div>
+          <ul class="psmall">
+            <li>Finds out about problems from business users, not their own systems</li>
+            <li>Hours of manual archaeology tracing a break back through fifteen pipelines</li>
+            <li>The dreaded call back to the PM explaining why the dashboard was wrong</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pbo">PBO — what they buy</div>
+          <ul class="psmall">
+            <li>"Stop being the last line of defense. Catch problems automatically so the PM isn't the alert mechanism." They buy time and sanity.</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-lang">Their language</div>
+          <div class="lang-pills">
+            <span class="lang-pill">pipeline reliability</span><span class="lang-pill">MTTD / MTTR</span><span class="lang-pill">dbt / Airflow / Snowflake</span><span class="lang-pill">root cause</span><span class="lang-pill">on-call</span><span class="lang-pill">false positives</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VP DATA -->
+    <div class="pcard">
+      <div class="pcard-head" onclick="togglePersona(this)">
+        <div class="pcard-ic pic-vp">VP</div>
+        <div class="pcard-ht">
+          <div class="pcard-role">VP Data / Analytics Leader</div>
+          <div class="pcard-tag">Day-to-day sponsor · bridges strategy & execution</div>
+        </div>
+        <span class="pcard-tog">+</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pstat">
+          <div class="pstat-num">$12.9M</div>
+          <div class="pstat-tx">Average annual cost of data downtime per enterprise. The VP Data is the person asked to reduce it while still shipping the roadmap.</div>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-press">Pressure they're under</div>
+          <ul class="psmall">
+            <li>Caught between the CDO's strategic mandate and the engineering team's capacity</li>
+            <li>Asked to deliver analytics + AI initiatives on time while reliability erodes trust</li>
+            <li>Owns the roadmap — every firefight is a feature not shipped</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pain">Core pain</div>
+          <ul class="psmall">
+            <li>Data trust issues slow adoption of the platforms they're building</li>
+            <li>Can't scale the team's output because too much capacity goes to maintenance</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pbo">PBO — what they buy</div>
+          <ul class="psmall">
+            <li>"Ship the roadmap and scale the platform without reliability becoming the bottleneck." They buy velocity and credibility.</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-lang">Their language</div>
+          <div class="lang-pills">
+            <span class="lang-pill">roadmap velocity</span><span class="lang-pill">platform adoption</span><span class="lang-pill">team productivity</span><span class="lang-pill">coverage</span><span class="lang-pill">scale</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CISO -->
+    <div class="pcard">
+      <div class="pcard-head" onclick="togglePersona(this)">
+        <div class="pcard-ic pic-ciso">CI</div>
+        <div class="pcard-ht">
+          <div class="pcard-role">CISO — Security & Compliance</div>
+          <div class="pcard-tag">Gatekeeper · data privacy & auditability</div>
+        </div>
+        <span class="pcard-tog">+</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pstat">
+          <div class="pstat-num">$400M</div>
+          <div class="pstat-tx">Citibank's 2020 OCC fine for data governance and internal-control failures. Data integrity is now a security-and-compliance issue, not just an engineering one.</div>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-press">Pressure they're under</div>
+          <ul class="psmall">
+            <li>Any new tool touching data triggers a security review they own</li>
+            <li>Accountable for what data leaves the environment and who can access it</li>
+            <li>Regulators increasingly asking for data lineage and audit trails</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pain">Core pain</div>
+          <ul class="psmall">
+            <li>Can't prove data handling is compliant on a ground level, only on paper</li>
+            <li>AI systems creating a new, poorly understood data attack surface</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pbo">PBO — what they buy</div>
+          <ul class="psmall">
+            <li>"Defensible, auditable data controls that satisfy a regulator — and a tool that reads metadata, not sensitive data." They buy a clean security review.</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-lang">Their language</div>
+          <div class="lang-pills">
+            <span class="lang-pill">data privacy</span><span class="lang-pill">audit trail</span><span class="lang-pill">access controls</span><span class="lang-pill">metadata-only</span><span class="lang-pill">security review</span><span class="lang-pill">compliance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTO -->
+    <div class="pcard">
+      <div class="pcard-head" onclick="togglePersona(this)">
+        <div class="pcard-ic pic-cto">CT</div>
+        <div class="pcard-ht">
+          <div class="pcard-role">CTO / VP Engineering</div>
+          <div class="pcard-tag">Often EB at smaller firms · AI program success</div>
+        </div>
+        <span class="pcard-tog">+</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pstat">
+          <div class="pstat-num">73%</div>
+          <div class="pstat-tx">Of enterprises won't ship an AI agent into production without monitoring in place. The CTO owns whether those agents can be trusted.</div>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-press">Pressure they're under</div>
+          <ul class="psmall">
+            <li>Accountable for AI program success and engineering velocity at once</li>
+            <li>Boards asking "are our AI systems safe to deploy?" with no clean answer</li>
+            <li>Build-vs-buy tension — strong engineers who think they can build it</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pain">Core pain</div>
+          <ul class="psmall">
+            <li>AI agents producing confident, well-formatted, wrong outputs on bad data</li>
+            <li>No visibility into agent behavior or data quality in production</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-pbo">PBO — what they buy</div>
+          <ul class="psmall">
+            <li>"Deploy AI with confidence and keep engineers building, not maintaining monitoring infrastructure." They buy AI trust + opportunity cost back.</li>
+          </ul>
+        </div>
+        <div class="pblock">
+          <div class="pblock-l pl-lang">Their language</div>
+          <div class="lang-pills">
+            <span class="lang-pill">AI program success</span><span class="lang-pill">engineering velocity</span><span class="lang-pill">build vs buy</span><span class="lang-pill">production reliability</span><span class="lang-pill">opportunity cost</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DUAL PERSONA -->
+  <div class="dual">
+    <h3>The dual-persona room — CDO + Data Engineer together</h3>
+    <p>Same problem, two registers. The CDO owns budget and signs; the data engineer owns technical depth and makes the POC succeed. Use technical language with the CDO and they tune out. Use business-impact language with the data engineer and they don't trust you. Your job: make both feel heard, make both feel the product solves their specific problem. Switch registers mid-conversation.</p>
+    <div class="transition">
+      <span class="tt-l">Shifting CDO → Data Engineer</span>
+      "That's helpful on the governance side. [Name] — from where you sit day-to-day, where does your team spend most of its time when something breaks? The investigation, the root cause, or the communication back to the business?"
+    </div>
+    <div class="transition">
+      <span class="tt-l">Shifting Data Engineer → CDO</span>
+      "That debugging process you described is exactly what creates the governance gap you mentioned — the time between when a problem starts and when anyone knows about it."
+    </div>
+    <p style="margin-top:12px;margin-bottom:0"><strong style="color:#fff">One product. Two champions.</strong> The CDO gets a business outcome. The data engineer gets operational relief.</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════ TAB 3: THE NARRATIVE ══════════════════════ -->
+<div id="tab-narrative" class="panel">
+
+  <div class="intro-note">
+    <strong>How to use this tab.</strong> This is your "why now / why Monte Carlo / why buy anything" ammunition. The differentiation insight reframes the whole category. The why-now stories build urgency. The four root causes explain why AI breaks. The pitch and competitive blocks are your positioning under pressure.
+  </div>
+
+  <!-- CHALLENGER INSIGHTS -->
+  <div class="sec-title">The reframes — pick the one that fits the room</div>
+  <p style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:12px">Three non-obvious insights to reframe the conversation. Each lands differently depending on who's across the table. Deliver after pain surfaces — never as an opener.</p>
+
+  <div class="feat">
+    <div class="feat-q">Reframe 01 — the executive / strategic room</div>
+    <div class="feat-h">If everyone has the same frontier models, the differentiation isn't the model. It's your data — and whether you can trust it.</div>
+    <div class="feat-tx">When every firm can access the same frontier AI, the model stops being the advantage. The edge becomes the <strong>proprietary data you hold and the insights you derive from it</strong>. Which means data reliability stops being a back-office function and becomes a source of competitive advantage. The firms that can trust, learn from, and act on their own data drive outsized outcomes. The ones that can't deploy the same models as everyone else — on a foundation they can't verify.</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-q">Reframe 02 — the data engineer / technical room</div>
+    <div class="feat-h">The gap isn't a tooling problem. It's a layer problem.</div>
+    <div class="feat-tx">Job-level monitoring tells you whether your pipelines <strong>ran</strong>. dbt tests catch the failures you <strong>scripted in advance</strong>. Neither tells you whether the output is actually trustworthy — whether a distribution shifted, a value drifted, or a schema changed in a way nobody wrote a rule for. <strong>That's the layer where the business ends up being your alert system.</strong> You're not under-tooled. You're monitoring the wrong altitude.</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-q">Reframe 03 — the AI / agent room</div>
+    <div class="feat-h">Your AI agents don't fail loudly. They fail confidently.</div>
+    <div class="feat-tx">A broken application throws an error. A broken agent returns a <strong>well-formatted, confident, wrong answer</strong> built on stale or corrupted data — and the person acting on it has no signal anything is off. As you move agents into production, the risk isn't downtime. It's <strong>silent, plausible wrongness at scale</strong>, with no error code and no alarm. The only way to trust an output is to trust the data underneath it — and be able to trace the output back to its source.</div>
+  </div>
+
+  <!-- WHY NOW STORIES -->
+  <div class="sec-title">Why now — the cost of getting this wrong</div>
+  <div class="story-grid">
+    <div class="story red">
+      <div class="story-num">$110M</div>
+      <div class="story-co">Unity Technologies</div>
+      <div class="story-tx">In 2022, bad data ingested into their ML ad-targeting tool corrupted the training set. Result: ~$110M revenue loss — roughly 8% of annual revenue — and a ~37% stock drop. One data quality failure, feeding a machine learning model, invisible until the business felt it.</div>
+      <div class="story-src">Source: Unity earnings, IBM, Monte Carlo</div>
+    </div>
+    <div class="story amber">
+      <div class="story-num">$400M</div>
+      <div class="story-co">Citibank</div>
+      <div class="story-tx">2020 OCC fine for long-standing failures in risk management, data governance, and internal controls. Followed by an additional $136M in 2024 for insufficient remediation. In regulated finance, data governance failure is a direct regulatory and financial event.</div>
+      <div class="story-src">Source: OCC, Federal Reserve, Banking Dive</div>
+    </div>
+    <div class="story blue">
+      <div class="story-num">⅓</div>
+      <div class="story-co">The AI trust gap</div>
+      <div class="story-tx">Nearly every enterprise is working on AI. Only about a third actually trust their data. Everyone is racing to deploy AI on a foundation most of them can't verify — the exact gap data observability closes.</div>
+      <div class="story-src">The macro driver behind the agent-trust pivot</div>
+    </div>
+  </div>
+
+  <!-- AGENT TRUST STATS -->
+  <div class="sec-title">Why now — the agent trust moment</div>
+  <div class="story-grid">
+    <div class="story blue">
+      <div class="story-num">73%</div>
+      <div class="story-co">Won't ship without monitoring</div>
+      <div class="story-tx">Of enterprises won't put an AI agent into production without monitoring and alerting in place. The demand for an observability layer is already here.</div>
+    </div>
+    <div class="story amber">
+      <div class="story-num">63%</div>
+      <div class="story-co">Observability is the blocker</div>
+      <div class="story-tx">Cite lack of observability as the top barrier to wider AI agent deployment. It's not the model holding them back — it's trust.</div>
+    </div>
+    <div class="story red">
+      <div class="story-num">53%</div>
+      <div class="story-co">Already rebuilding</div>
+      <div class="story-tx">Are already planning to rebuild agent systems they rushed into production without proper monitoring. The cost of shipping blind is landing now.</div>
+    </div>
+  </div>
+
+  <!-- 4 ROOT CAUSES -->
+  <div class="sec-title">Why AI is unreliable — the four root causes</div>
+  <p style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:6px">Barr Moses' framework for why AI outputs fail. Monte Carlo sits at the data layer underneath all four — which is why it can trace a bad output back to its actual cause.</p>
+  <div class="root-grid">
+    <div class="root">
+      <div class="root-n">1</div>
+      <div class="root-t">
+        <div class="rt-h">The data is wrong</div>
+        <div class="rt-x">Wrong values, didn't arrive, or didn't arrive on time. The input itself is bad — so the output is bad, no matter how good the model is.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">2</div>
+      <div class="root-t">
+        <div class="rt-h">The code is wrong</div>
+        <div class="rt-x">A change in transformation logic or agent code creates downstream issues. The pipeline runs; the logic silently produces something wrong.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">3</div>
+      <div class="root-t">
+        <div class="rt-h">The system fails</div>
+        <div class="rt-x">The infrastructure itself breaks. 100% of systems fail eventually — the question is whether you detect it before the business does.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">4</div>
+      <div class="root-t">
+        <div class="rt-h">The model output is off</div>
+        <div class="rt-x">Perfect prompt, perfect context — and it still hallucinates or isn't fit for purpose. The output needs monitoring even when everything upstream looks clean.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PITCH -->
+  <div class="sec-title">The pitch — framing & differentiation</div>
+  <div class="pitch-card">
+    <h3>The fastest explanation in any room — the Datadog analogy</h3>
+    <div class="pitch-lead">Before Datadog, engineers flew blind on application health — they found out services were down when users complained. Datadog built the layer that caught failures before users felt them. Monte Carlo does the same thing for data: it catches data failures before the business feels them. <strong>Same problem, different layer of the stack.</strong> Every technical buyer knows Datadog — so this makes a new category instantly understandable.</div>
+  </div>
+  <div class="pitch-card">
+    <h3>The one-line value prop</h3>
+    <div class="pitch-lead">"The question every data team is answering today is: do you find out something's wrong before the business feels it, or after? Without observability, it's after. Monte Carlo makes it before — across data quality and the AI systems built on top of it."</div>
+  </div>
+  <div class="pitch-card">
+    <h3>The moat — why MC, not a competitor</h3>
+    <div class="pitch-lead">Monte Carlo owns the <strong>data quality layer underneath</strong> the applications and models. When an AI agent produces a wrong answer, MC traces it back to the upstream pipeline that caused it — end-to-end lineage from source to dashboard to model output. No application-monitoring or model-monitoring tool has that. That's the defensible position.</div>
+  </div>
+
+  <!-- WHAT MC SOLVES -> BUSINESS OUTCOMES -->
+  <div class="sec-title">What Monte Carlo solves → translated to business outcomes</div>
+  <p style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:6px">The capability is never the point. Every one of these translates a technical capability into a number a CFO or board cares about.</p>
+  <div class="root-grid">
+    <div class="root">
+      <div class="root-n">1</div>
+      <div class="root-t">
+        <div class="rt-h">Detect before the business does</div>
+        <div class="rt-x">ML detection across 5 pillars catches issues before they reach a dashboard, model, or filing. <strong>Outcome:</strong> data downtime cut, often by ~half within weeks — fewer bad decisions made on bad data.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">2</div>
+      <div class="root-t">
+        <div class="rt-h">Resolve in minutes, not hours</div>
+        <div class="rt-x">End-to-end lineage shows root cause and blast radius instantly. <strong>Outcome:</strong> engineering hours redirected from firefighting (~40% of the week) back to building revenue-generating work.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">3</div>
+      <div class="root-t">
+        <div class="rt-h">Make data trust auditable</div>
+        <div class="rt-x">Continuous monitoring + lineage as documentation. <strong>Outcome:</strong> a defensible answer for regulators, the board, and LP due diligence — turning "we hope" into "we can prove."</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">4</div>
+      <div class="root-t">
+        <div class="rt-h">Ship AI you can trust</div>
+        <div class="rt-x">Agent observability ties model outputs back to data quality. <strong>Outcome:</strong> AI initiatives reach production instead of stalling on the 63% observability barrier — protecting AI program ROI.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">5</div>
+      <div class="root-t">
+        <div class="rt-h">Scale trust without scaling headcount</div>
+        <div class="rt-x">ML learns every table automatically — no manual rules across thousands of tables. <strong>Outcome:</strong> coverage scales with the data estate without a proportional increase in engineers.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">6</div>
+      <div class="root-t">
+        <div class="rt-h">Restore the business's trust in data</div>
+        <div class="rt-x">When the business stops finding the errors, adoption rises. <strong>Outcome:</strong> as one customer put it, eliminating data distrust and rebuilding the partnership between the data team and the business.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPETITIVE -->
+  <div class="sec-title">Competitive positioning — acknowledge, isolate the gap, reframe</div>
+  <div class="comp-row">
+    <div class="comp-cell comp-vs">vs. dbt tests</div>
+    <div class="comp-cell comp-pos"><strong>Acknowledge:</strong> table stakes for serious teams. <strong>Gap:</strong> dbt tests catch failures you scripted in advance — not novel anomalies or distribution shifts nobody wrote a rule for. <strong>Reframe:</strong> rules layer + anomaly-detection layer. Complementary, not competing.</div>
+  </div>
+  <div class="comp-row">
+    <div class="comp-cell comp-vs">vs. "we'll build it"</div>
+    <div class="comp-cell comp-pos"><strong>Acknowledge:</strong> your team has the capability. <strong>Gap:</strong> 6–12 months to build across 5 pillars + lineage, then maintain it forever — infrastructure that isn't your core business. <strong>Reframe:</strong> opportunity cost. What do the pipelines and models they're not building cost you?</div>
+  </div>
+  <div class="comp-row">
+    <div class="comp-cell comp-vs">vs. Snowflake / Databricks native</div>
+    <div class="comp-cell comp-pos"><strong>Acknowledge:</strong> strong within their ecosystem. <strong>Gap:</strong> blind outside their own platform; can't map lineage across Fivetran → dbt → Snowflake → Tableau → AI. <strong>Reframe:</strong> MC is stack-agnostic, end-to-end.</div>
+  </div>
+  <div class="comp-row">
+    <div class="comp-cell comp-vs">vs. Datadog / Grafana</div>
+    <div class="comp-cell comp-pos"><strong>Acknowledge:</strong> excellent at infrastructure, APIs, app uptime. <strong>Gap:</strong> they watch whether the pipeline ran — not whether the output is trustworthy. Different layer entirely. <strong>Reframe:</strong> they monitor the app; MC monitors the data underneath it.</div>
+  </div>
+  <div class="comp-row">
+    <div class="comp-cell comp-vs">"No budget right now"</div>
+    <div class="comp-cell comp-pos"><strong>Not a budget objection — an unquantified-BAU objection.</strong> "What's the cost of your current approach when something breaks and reaches the business — engineering time, a regulatory event, a bad decision?" Make the cost of the status quo explicit first; budget becomes a different conversation.</div>
+  </div>
+
+  <!-- RECENT / ROADMAP DIRECTION -->
+  <div class="sec-title">Where the product is heading — reactive to preventive</div>
+  <div class="pitch-card">
+    <h3>The Claude integration & the shift to prevention</h3>
+    <div class="pitch-lead">Monte Carlo's June 2026 Claude integration signals the strategic direction: from <strong>reactive</strong> (catch breaks after they reach production) to <strong>preventive</strong> (validate data quality as engineers write code). Data trust checks move into the development workflow itself — monitoring coverage becomes part of the build, not a layer bolted on after deployment. For a buyer, this matters because it reframes observability from "an insurance policy" to "a quality gate" — the cost of a break avoided entirely is higher than the cost of one caught fast.</div>
+  </div>
+  <div class="pitch-card">
+    <h3>The category move — data observability → agent trust</h3>
+    <div class="pitch-lead">Monte Carlo now positions as the <strong>agent trust platform</strong> — unifying data observability and agent observability to monitor, troubleshoot, and improve production AI systems. The roadmap direction is full visibility across the entire agentic estate: not just "is the data good" but "is the agent built on that data behaving correctly in production." This is the expansion that keeps MC ahead of pure data-quality tools and application-monitoring tools alike.</div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- FIXED MACRO FOOTER -->
+<div class="macro-footer" id="macroFooter">
+  <div class="macro-inner">
+    <div class="macro-head">
+      <span class="macro-label">The six questions every conversation must answer</span>
+      <button class="macro-toggle" onclick="toggleMacro()">Hide</button>
+    </div>
+    <div class="macro-q-row">
+      <div class="macro-q"><span class="mq-n">01</span><span class="mq-t">Is there a problem?</span><span class="mq-s">Real, not a category</span></div>
+      <div class="macro-q"><span class="mq-n">02</span><span class="mq-t">Will they admit BAU?</span><span class="mq-s">In their own words</span></div>
+      <div class="macro-q"><span class="mq-n">03</span><span class="mq-t">Is it quantified?</span><span class="mq-s">Metric tied to an objective</span></div>
+      <div class="macro-q"><span class="mq-n">04</span><span class="mq-t">Is there urgency?</span><span class="mq-s">Why now, not next year</span></div>
+      <div class="macro-q"><span class="mq-n">05</span><span class="mq-t">Why Monte Carlo?</span><span class="mq-s">vs. every alternative</span></div>
+      <div class="macro-q"><span class="mq-n">06</span><span class="mq-t">Why buy anything?</span><span class="mq-s">Cost of inaction > action</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(name, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleStage(el){ el.parentElement.classList.toggle('open'); }
+function togglePersona(el){ el.parentElement.classList.toggle('open'); }
+function togglePop(el){
+  const p = el.nextElementSibling;
+  p.classList.toggle('open');
+  el.textContent = p.classList.contains('open') ? '⚠ Common pitfalls & how to overcome — close' : '⚠ Common pitfalls & how to overcome — open';
+}
+function toggleMacro(){
+  const f = document.getElementById('macroFooter');
+  const btn = f.querySelector('.macro-toggle');
+  f.classList.toggle('collapsed');
+  btn.textContent = f.classList.contains('collapsed') ? 'Show' : 'Hide';
+}
+</script>
+</body>
+</html>
