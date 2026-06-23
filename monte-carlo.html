@@ -360,6 +360,70 @@ ul.psmall li::before{content:"–";color:var(--tx3);flex-shrink:0}
       </div>
 
       <div class="sub">
+        <div class="sub-label">Financial services & regulated industry — specific angles</div>
+        <ul class="pts"><li>These questions require genuine FS buyer knowledge. Use them after you've established the operational pain — they elevate the conversation to board and regulatory stakes no generic observability vendor can credibly navigate.</li></ul>
+        <div class="qcard">
+          <span class="q-tag">Regulatory · SEC AI governance</span>
+          "Given where the SEC is going on AI governance — if an examiner asked you today to produce the data lineage behind a specific AI output from last quarter, what would that process look like for your team? Is that a 10-minute answer or a 2-week investigation?"
+          <div class="q-why">Forces the CDO to confront auditability in concrete regulatory terms. "Examiner asked today" makes it real, not hypothetical. Almost no firm has a 10-minute answer — and when they admit that, you've surfaced the gap without characterizing it yourself.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Regulatory · LP due diligence</span>
+          "When your next institutional allocator runs their data governance DDQ — and they get to the question about how you systematically monitor and document data quality in your AI systems — what's your team's current answer? A documented, defensible response, or more of a 'we do our best' conversation?"
+          <div class="q-why">LP DDQ is a capital-gating event — a failed DDQ can block $50M-$500M in uncommitted capital. "Documented and defensible vs. best efforts" is the specific contrast that lands. CDOs know exactly which camp they're in, and the uncomfortable ones will tell you.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Regulatory · AI audit trail</span>
+          "You mentioned your AI research assistant. Walk me through what happens if a portfolio manager makes a decision based on its output — and two days later you find out the underlying data was stale by 18 hours at the time. Who finds out? What's the conversation with that PM? And what documentation exists to explain what happened?"
+          <div class="q-why">Three sub-questions force them to trace through the actual process — detection, communication, and documentation — and confront the absence of each. Most teams have no answer to the third question. That silence is the moment.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Guided business implication questions — specific scenarios, not open-ended impact asks</div>
+        <ul class="pts"><li>"What's the business impact?" is an unanswerable question. Ask about a specific scenario — the last real incident, a concrete failure mode — so the buyer can actually respond and quantify the cost themselves.</li></ul>
+        <div class="qcard">
+          <span class="q-tag">Guided implication · real incident anchor</span>
+          "When a data problem reaches a PM or analyst before your team catches it — not every incident, just the last notable one — what happened? Who called who? How long before you knew what actually broke?"
+          <div class="q-why">"Not every incident, just the last notable one" removes the ability to answer abstractly. Anchoring in a real event they've lived through surfaces authentic pain, gives you a story to reference throughout the cycle, and establishes BAU more powerfully than any hypothetical.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Guided implication · detection scenario</span>
+          "If a Snowflake table that powers your daily risk report hadn't refreshed since 3am — and it's now 9am — and your team didn't know: how would you find out? Who would call who? How long until someone notices?"
+          <div class="q-why">Specific, realistic scenario. Forces them to walk through their actual detection process out loud. If the answer is "one of the analysts would probably flag it in Slack" — that's BAU confirmed in their own words without you naming it.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Guided implication · blast radius</span>
+          "When something breaks upstream and cascades into multiple dashboards simultaneously — how long before you know the full blast radius? And how do you notify the business teams affected when you don't yet know which ones to call first?"
+          <div class="q-why">Tests whether they experience lineage as a pain point. "When you don't yet know which ones to call first" pins the specific gap — almost nobody has an answer, and when they don't, lineage is the direct solution you introduce.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Guided implication · opportunity cost</span>
+          "You mentioned your team spends roughly [X]% of the week firefighting. If you could redirect that time to building — what's the one initiative that would ship first? And what's that initiative worth to the business if it ships 6 months sooner?"
+          <div class="q-why">Turns a time metric into a business value metric. Gets them to articulate the opportunity cost in their own words. Whatever they say becomes your ROI anchor for the business case and the close conversation.</div>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="sub-label">Compute cost & CI/CD — the gaps most discovery calls miss</div>
+        <div class="qcard">
+          <span class="q-tag">Compute cost · invisible waste</span>
+          "When a pipeline failure isn't caught immediately and Airflow keeps running jobs on corrupted or incomplete data for several hours — do you have visibility into how much Snowflake compute those unnecessary runs consumed? Has anyone calculated that number?"
+          <div class="q-why">Most teams haven't calculated this. If they haven't, you've surfaced a cost that was invisible — and MC's circuit breakers (which automatically stop Airflow DAGs the moment an error is detected) become an ROI story beyond data quality alone. The waste from one bad overnight batch run can cost thousands in Snowflake credits.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">Compute cost · unused assets</span>
+          "Do you have visibility into what percentage of your Snowflake tables, fields, and queries are actively used versus sitting unused? And who's responsible for identifying what can be deprecated to reduce your compute footprint?"
+          <div class="q-why">Storage and compute costs from unused assets are a common, invisible Snowflake pain. MC surfaces which tables, fields, and queries are unused — enabling deprecation and bill reduction. For a CFO or COO this is a direct ROI conversation that bypasses the "data quality" budget category entirely.</div>
+        </div>
+        <div class="qcard">
+          <span class="q-tag">CI/CD · monitoring at build time</span>
+          "Right now, when a data engineer pushes a change to a dbt model or a transformation — is there any data quality gate before it hits production? Or does the first signal that something's wrong come from downstream, after it's already caused an issue?"
+          <div class="q-why">Tests whether monitoring is embedded in their build process. Almost every team says "downstream." That's the CI/CD gap — MC can embed quality checks into the code review stage so bad changes don't reach production in the first place. This is the reactive-to-preventive shift the Claude integration represents.</div>
+        </div>
+      </div>
+
+      <div class="sub">
         <div class="sub-label">Need-payoff — make them describe the future</div>
         <div class="qcard">
           <span class="q-tag">Need-payoff</span>
@@ -1088,6 +1152,71 @@ ul.psmall li::before{content:"–";color:var(--tx3);flex-shrink:0}
   <div class="comp-row">
     <div class="comp-cell comp-vs">"No budget right now"</div>
     <div class="comp-cell comp-pos"><strong>Not a budget objection — an unquantified-BAU objection.</strong> "What's the cost of your current approach when something breaks and reaches the business — engineering time, a regulatory event, a bad decision?" Make the cost of the status quo explicit first; budget becomes a different conversation.</div>
+  </div>
+
+  <!-- THREE PLATFORM AGENTS -->
+  <div class="sec-title">The three platform agents — how the product actually works</div>
+  <p style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:14px">Most buyers hear "MC" and think monitoring dashboard. The product is actually three specialized agents that handle detection, diagnosis, and operations. Understanding this distinction separates a credible conversation from a surface-level one — and it's how John and his team talk about the platform internally.</p>
+  <div class="root-grid" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="root" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="root-n" style="background:var(--blue);width:30px;height:30px;border-radius:8px;flex-shrink:0;font-size:13px">👁</div>
+        <div class="rt-h" style="font-size:13px;font-weight:700">Monitoring Agent</div>
+      </div>
+      <div class="rt-x"><strong>What it does:</strong> Always-on detection across the entire data estate. Auto-scales as your environment grows — no manual configuration required. Watches every table across all five pillars simultaneously.<br><br><strong>The analogy:</strong> Like a security camera system covering every room, that learns what normal looks like and alerts the moment something deviates. It doesn't need someone to tell it where to look — and it doesn't need reconfiguring when you add new rooms.<br><br><strong>Key point for Marcus:</strong> Coverage scales automatically as you add new tables, pipelines, or AI agents. You don't write new monitors every time the stack changes.</div>
+    </div>
+    <div class="root" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="root-n" style="background:var(--green);width:30px;height:30px;border-radius:8px;flex-shrink:0;font-size:13px">🔬</div>
+        <div class="rt-h" style="font-size:13px;font-weight:700">Troubleshooting Agent</div>
+      </div>
+      <div class="rt-x"><strong>What it does:</strong> When something breaks, automatically diagnoses the root cause and prescribes a fix. Reduces resolution time by 80%. It can tell you why a dbt test failed — not just that it failed.<br><br><strong>The analogy:</strong> Instead of a data engineer spending 4-6 hours pulling Airflow logs, tracing dbt models, and querying Snowflake tables manually to find the break — the Troubleshooting Agent does that entire investigation automatically and surfaces the answer.<br><br><strong>Key point for Marcus:</strong> That 4-6 hour root cause investigation you described — this is the direct answer. "What would it mean if your team got that 4-6 hours back on every incident?" is the question to ask.</div>
+    </div>
+    <div class="root" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="root-n" style="background:var(--amber);width:30px;height:30px;border-radius:8px;flex-shrink:0;font-size:13px">⚙️</div>
+        <div class="rt-h" style="font-size:13px;font-weight:700">Operations Agent</div>
+      </div>
+      <div class="rt-x"><strong>What it does:</strong> Manages the operational health of the overall data and AI platform — cost optimization, performance monitoring, scale. Identifies expensive queries, unused assets, and token cost inefficiencies across AI systems.<br><br><strong>The analogy:</strong> Like a facility manager who continuously tracks energy usage across every room, identifies what's wasteful, and surfaces specific recommendations — but for your entire data infrastructure and AI estate.<br><br><strong>Key point for CDO / CFO:</strong> This is the ROI conversation beyond data quality. Reduced Snowflake compute costs, deprecated unused storage, optimized AI token costs. The total cost picture, not just reliability.</div>
+    </div>
+  </div>
+  <div class="vbox insight" style="margin-top:14px">
+    <span class="v-tag">The positioning line — use this when someone says "so it's a monitoring tool"</span>
+    "Most observability tools watch for problems and alert. MC's three agents watch, diagnose, and resolve — covering detection, root cause analysis, and operational optimization as one connected system. You're not just getting alerts. You're getting answers and a path to fix it."
+  </div>
+
+  <!-- EXPANDED USE CASES -->
+  <div class="sec-title">Use cases beyond core observability</div>
+  <p style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:6px">Four scenarios that create value outside the standard "data quality monitoring" framing. Each represents a separate budget angle or a distinct conversation with a different stakeholder.</p>
+  <div class="root-grid">
+    <div class="root">
+      <div class="root-n">💰</div>
+      <div class="root-t">
+        <div class="rt-h">Cloud Compute Cost Management</div>
+        <div class="rt-x"><strong>The problem:</strong> When a pipeline failure isn't caught, Airflow keeps running jobs on bad data — burning Snowflake compute on results nobody will trust. Unused tables and inefficient queries inflate the bill invisibly month after month.<br><br><strong>What MC does:</strong> Circuit breakers automatically stop Airflow DAGs the moment an error is detected — no more compute wasted on corrupted runs. Also identifies high-consumption queries and unused assets so teams can deprecate and reduce the bill.<br><br><strong>The business angle:</strong> "One bad overnight batch run on corrupted data can cost thousands in Snowflake credits. How many of those are you absorbing a month?" Frames the ROI in CFO language, not engineering language.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">🔧</div>
+      <div class="root-t">
+        <div class="rt-h">CI/CD Pipeline Integration — Shift Left</div>
+        <div class="rt-x"><strong>The problem:</strong> Data quality monitoring is almost always bolted on after code ships. A bad dbt model change causes silent failures for hours before anyone knows — because there's no quality gate before it hits production.<br><br><strong>What MC does:</strong> Embeds quality checks directly into the CI/CD workflow. Engineers can design and deploy data quality monitors in SQL during code review — before changes reach production. Trust ships with the code, not after it breaks in production.<br><br><strong>The business angle:</strong> "The cost of a data quality issue caught at code review is essentially zero. The cost of the same issue caught at 3am by the business is 4-6 hours of engineering plus however many decisions were made on wrong data." That delta is the ROI.</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">🌐</div>
+      <div class="root-t">
+        <div class="rt-h">Data Democratization — Trust as the Adoption Prerequisite</div>
+        <div class="rt-x"><strong>The problem:</strong> When organizations expand data access to business users, scrutiny rises with usage. Stakeholders who couldn't see the data before now notice when it's wrong. Reliability failures undermine the entire self-service analytics investment.<br><br><strong>What MC does:</strong> Makes data trustworthy enough that business users actually adopt it. JetBlue improved their internal "Data NPS" — a measure of business trust in data — by 16 points year-over-year after deploying MC.<br><br><strong>The business angle for CDO:</strong> "What's the adoption rate on your Snowflake investment among non-engineering teams? And how much of the hesitation is driven by 'I don't fully trust this data' rather than capability gaps?"</div>
+      </div>
+    </div>
+    <div class="root">
+      <div class="root-n">🚚</div>
+      <div class="root-t">
+        <div class="rt-h">Data Migration — The Highest-Risk Window</div>
+        <div class="rt-x"><strong>The problem:</strong> Cloud migrations and major platform upgrades create the most silent data failures. Schemas change. Transformation logic that worked on-prem breaks in Snowflake. Historical data arrives corrupted. Performance degrades unpredictably. You typically find out weeks later when business users notice wrong numbers.<br><br><strong>What MC does:</strong> Acts as the safety net during migration — catching breaks in real time during the transition rather than discovering them after they've propagated into production.<br><br><strong>Discovery trigger:</strong> "Are you in the middle of any platform migrations or major infrastructure changes? Those windows are when the most invisible data quality issues happen — where things look like they're working but something changed upstream."</div>
+      </div>
+    </div>
   </div>
 
   <!-- RECENT / ROADMAP DIRECTION -->
